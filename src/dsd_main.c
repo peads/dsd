@@ -251,67 +251,67 @@ initState (dsd_state * state)
 void
 usage ()
 {
-  printf ("\n");
-  printf ("Usage: dsd [options]            Live scanner mode\n");
-  printf ("  or:  dsd [options] -r <files> Read/Play saved mbe data from file(s)\n");
-  printf ("  or:  dsd -h                   Show help\n");
-  printf ("\n");
-  printf ("Display Options:\n");
-  printf ("  -e            Show Frame Info and errorbars (default)\n");
-  printf ("  -pe           Show P25 encryption sync bits\n");
-  printf ("  -pl           Show P25 link control bits\n");
-  printf ("  -ps           Show P25 status bits and low speed data\n");
-  printf ("  -pt           Show P25 talkgroup info\n");
-  printf ("  -q            Don't show Frame Info/errorbars\n");
-  printf ("  -s            Datascope (disables other display options)\n");
-  printf ("  -t            Show symbol timing during sync\n");
-  printf ("  -v <num>      Frame information Verbosity\n");
-  printf ("  -z <num>      Frame rate for datascope\n");
-  printf ("\n");
-  printf ("Input/Output options:\n");
-  printf ("  -i <device>   Audio input device (default is /dev/audio, - for piped stdin)\n");
-  printf ("  -o <device>   Audio output device (default is /dev/audio)\n");
-  printf ("  -d <dir>      Create mbe data files, use this directory\n");
-  printf ("  -r <files>    Read/Play saved mbe data from file(s)\n");
-  printf ("  -g <num>      Audio output gain (default = 0 = auto, disable = -1)\n");
-  printf ("  -n            Do not send synthesized speech to audio output device\n");
-  printf ("  -w <file>     Output synthesized speech to a .wav file\n");
-  printf ("  -a            Display port audio devices\n");
-  printf ("\n");
-  printf ("Scanner control options:\n");
-  printf ("  -B <num>      Serial port baud rate (default=115200)\n");
-  printf ("  -C <device>   Serial port for scanner control (default=/dev/ttyUSB0)\n");
-  printf ("  -R <num>      Resume scan after <num> TDULC frames or any PDU or TSDU\n");
-  printf ("\n");
-  printf ("Decoder options:\n");
-  printf ("  -fa           Auto-detect frame type (default)\n");
-  printf ("  -f1           Decode only P25 Phase 1\n");
-  printf ("  -fd           Decode only D-STAR\n");
-  printf ("  -fi           Decode only NXDN48* (6.25 kHz) / IDAS*\n");
-  printf ("  -fn           Decode only NXDN96 (12.5 kHz)\n");
-  printf ("  -fp           Decode only ProVoice*\n");
-  printf ("  -fr           Decode only DMR/MOTOTRBO\n");
-  printf ("  -fx           Decode only X2-TDMA\n");
-  printf ("  -l            Disable DMR/MOTOTRBO and NXDN input filtering\n");
-  printf ("  -ma           Auto-select modulation optimizations (default)\n");
-  printf ("  -mc           Use only C4FM modulation optimizations\n");
-  printf ("  -mg           Use only GFSK modulation optimizations\n");
-  printf ("  -mq           Use only QPSK modulation optimizations\n");
-  printf ("  -pu           Unmute Encrypted P25\n");
-  printf ("  -u <num>      Unvoiced speech quality (default=3)\n");
-  printf ("  -xx           Expect non-inverted X2-TDMA signal\n");
-  printf ("  -xr           Expect inverted DMR/MOTOTRBO signal\n");
-  printf ("\n");
-  printf ("  * denotes frame types that cannot be auto-detected.\n");
-  printf ("\n");
-  printf ("Advanced decoder options:\n");
-  printf ("  -A <num>      QPSK modulation auto detection threshold (default=26)\n");
-  printf ("  -S <num>      Symbol buffer size for QPSK decision point tracking\n");
-  printf ("                 (default=36)\n");
-  printf ("  -M <num>      Min/Max buffer size for QPSK decision point tracking\n");
-  printf ("                 (default=15)\n");
-  printf ("\n");
-  printf ("Report bugs to: https://github.com/szechyjs/dsd/issues\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Usage: dsd [options]            Live scanner mode\n");
+ fprintf(stderr, "  or:  dsd [options] -r <files> Read/Play saved mbe data from file(s)\n");
+ fprintf(stderr, "  or:  dsd -h                   Show help\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Display Options:\n");
+ fprintf(stderr, "  -e            Show Frame Info and errorbars (default)\n");
+ fprintf(stderr, "  -pe           Show P25 encryption sync bits\n");
+ fprintf(stderr, "  -pl           Show P25 link control bits\n");
+ fprintf(stderr, "  -ps           Show P25 status bits and low speed data\n");
+ fprintf(stderr, "  -pt           Show P25 talkgroup info\n");
+ fprintf(stderr, "  -q            Don't show Frame Info/errorbars\n");
+ fprintf(stderr, "  -s            Datascope (disables other display options)\n");
+ fprintf(stderr, "  -t            Show symbol timing during sync\n");
+ fprintf(stderr, "  -v <num>      Frame information Verbosity\n");
+ fprintf(stderr, "  -z <num>      Frame rate for datascope\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Input/Output options:\n");
+ fprintf(stderr, "  -i <device>   Audio input device (default is /dev/audio, - for piped stdin)\n");
+ fprintf(stderr, "  -o <device>   Audio output device (default is /dev/audio)\n");
+ fprintf(stderr, "  -d <dir>      Create mbe data files, use this directory\n");
+ fprintf(stderr, "  -r <files>    Read/Play saved mbe data from file(s)\n");
+ fprintf(stderr, "  -g <num>      Audio output gain (default = 0 = auto, disable = -1)\n");
+ fprintf(stderr, "  -n            Do not send synthesized speech to audio output device\n");
+ fprintf(stderr, "  -w <file>     Output synthesized speech to a .wav file\n");
+ fprintf(stderr, "  -a            Display port audio devices\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Scanner control options:\n");
+ fprintf(stderr, "  -B <num>      Serial port baud rate (default=115200)\n");
+ fprintf(stderr, "  -C <device>   Serial port for scanner control (default=/dev/ttyUSB0)\n");
+ fprintf(stderr, "  -R <num>      Resume scan after <num> TDULC frames or any PDU or TSDU\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Decoder options:\n");
+ fprintf(stderr, "  -fa           Auto-detect frame type (default)\n");
+ fprintf(stderr, "  -f1           Decode only P25 Phase 1\n");
+ fprintf(stderr, "  -fd           Decode only D-STAR\n");
+ fprintf(stderr, "  -fi           Decode only NXDN48* (6.25 kHz) / IDAS*\n");
+ fprintf(stderr, "  -fn           Decode only NXDN96 (12.5 kHz)\n");
+ fprintf(stderr, "  -fp           Decode only ProVoice*\n");
+ fprintf(stderr, "  -fr           Decode only DMR/MOTOTRBO\n");
+ fprintf(stderr, "  -fx           Decode only X2-TDMA\n");
+ fprintf(stderr, "  -l            Disable DMR/MOTOTRBO and NXDN input filtering\n");
+ fprintf(stderr, "  -ma           Auto-select modulation optimizations (default)\n");
+ fprintf(stderr, "  -mc           Use only C4FM modulation optimizations\n");
+ fprintf(stderr, "  -mg           Use only GFSK modulation optimizations\n");
+ fprintf(stderr, "  -mq           Use only QPSK modulation optimizations\n");
+ fprintf(stderr, "  -pu           Unmute Encrypted P25\n");
+ fprintf(stderr, "  -u <num>      Unvoiced speech quality (default=3)\n");
+ fprintf(stderr, "  -xx           Expect non-inverted X2-TDMA signal\n");
+ fprintf(stderr, "  -xr           Expect inverted DMR/MOTOTRBO signal\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "  * denotes frame types that cannot be auto-detected.\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Advanced decoder options:\n");
+ fprintf(stderr, "  -A <num>      QPSK modulation auto detection threshold (default=26)\n");
+ fprintf(stderr, "  -S <num>      Symbol buffer size for QPSK decision point tracking\n");
+ fprintf(stderr, "                 (default=36)\n");
+ fprintf(stderr, "  -M <num>      Min/Max buffer size for QPSK decision point tracking\n");
+ fprintf(stderr, "                 (default=15)\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Report bugs to: https://github.com/szechyjs/dsd/issues\n");
   exit (0);
 }
 
@@ -365,15 +365,14 @@ void
 cleanupAndExit (dsd_opts * opts, dsd_state * state)
 {
   noCarrier (opts, state);
-  if (opts->wav_out_f != NULL)
-    {
-      closeWavOutFile (opts, state);
+    if (opts->wav_out_f) {
+        sf_close(opts->wav_out_f);
     }
 
 #ifdef USE_PORTAUDIO
 	if((opts->audio_in_type == 2) || (opts->audio_out_type == 2))
 	{
-		printf("Terminating portaudio.\n");
+	fprintf(stderr, "Terminating portaudio.\n");
 		PaError err = paNoError;
 		if(opts->audio_in_pa_stream != NULL)
 		{
@@ -414,17 +413,17 @@ cleanupAndExit (dsd_opts * opts, dsd_state * state)
 	}
 #endif
 
-  printf("\n");
-  printf("Total audio errors: %i\n", state->debug_audio_errors);
-  printf("Total header errors: %i\n", state->debug_header_errors);
-  printf("Total irrecoverable header errors: %i\n", state->debug_header_critical_errors);
+ fprintf(stderr, "\n");
+ fprintf(stderr, "Total audio errors: %i\n", state->debug_audio_errors);
+ fprintf(stderr, "Total header errors: %i\n", state->debug_header_errors);
+ fprintf(stderr, "Total irrecoverable header errors: %i\n", state->debug_header_critical_errors);
 
   //debug_print_heuristics(&(state->p25_heuristics));
 
-  printf("\n");
-  printf("+P25 BER estimate: %.2f%%\n", get_P25_BER_estimate(&state->p25_heuristics));
-  printf("-P25 BER estimate: %.2f%%\n", get_P25_BER_estimate(&state->inv_p25_heuristics));
-  printf("\n");
+ fprintf(stderr, "\n");
+ fprintf(stderr, "+P25 BER estimate: %.2f%%\n", get_P25_BER_estimate(&state->p25_heuristics));
+ fprintf(stderr, "-P25 BER estimate: %.2f%%\n", get_P25_BER_estimate(&state->inv_p25_heuristics));
+ fprintf(stderr, "\n");
 
 #ifdef TRACE_DSD
   if (state->debug_label_file != NULL) {
@@ -441,7 +440,7 @@ cleanupAndExit (dsd_opts * opts, dsd_state * state)
   }
 #endif
 
-  printf ("Exiting.\n");
+ fprintf(stderr, "Exiting.\n");
   exit (0);
 }
 
@@ -463,8 +462,8 @@ main (int argc, char **argv)
   char versionstr[25];
   mbe_printVersion (versionstr);
 
-  printf ("Digital Speech Decoder 1.7.0-dev (build:%s)\n", GIT_TAG);
-  printf ("mbelib version %s\n", versionstr);
+ fprintf(stderr, "Digital Speech Decoder 1.7.0-dev (build:%s)\n", GIT_TAG);
+ fprintf(stderr, "mbelib version %s\n", versionstr);
 
   initOpts (&opts);
   initState (&state);
@@ -539,7 +538,7 @@ main (int argc, char **argv)
           opts.p25tg = 0;
           opts.datascope = 1;
           opts.symboltiming = 0;
-          printf ("Setting datascope frame rate to %i frame per second.\n", opts.scoperate);
+         fprintf(stderr, "Setting datascope frame rate to %i frame per second.\n", opts.scoperate);
           break;
         case 'i':
           strncpy(opts.audio_in_dev, optarg, 1023);
@@ -552,33 +551,33 @@ main (int argc, char **argv)
         case 'd':
           strncpy(opts.mbe_out_dir, optarg, 1023);
           opts.mbe_out_dir[1023] = '\0';
-          printf ("Writing mbe data files to directory %s\n", opts.mbe_out_dir);
+         fprintf(stderr, "Writing mbe data files to directory %s\n", opts.mbe_out_dir);
           break;
         case 'g':
           sscanf (optarg, "%f", &opts.audio_gain);
           if (opts.audio_gain < (float) 0 )
             {
-              printf ("Disabling audio out gain setting\n");
+             fprintf(stderr, "Disabling audio out gain setting\n");
             }
           else if (opts.audio_gain == (float) 0)
             {
               opts.audio_gain = (float) 0;
-              printf ("Enabling audio out auto-gain\n");
+             fprintf(stderr, "Enabling audio out auto-gain\n");
             }
           else
             {
-              printf ("Setting audio out gain to %f\n", opts.audio_gain);
+             fprintf(stderr, "Setting audio out gain to %f\n", opts.audio_gain);
               state.aout_gain = opts.audio_gain;
             }
           break;
         case 'n':
           opts.audio_out = 0;
-          printf ("Disabling audio output to soundcard.\n");
+         fprintf(stderr, "Disabling audio output to soundcard.\n");
           break;
         case 'w':
           strncpy(opts.wav_out_file, optarg, 1023);
           opts.wav_out_file[1023] = '\0';
-          printf ("Writing audio to file %s\n", opts.wav_out_file);
+         fprintf(stderr, "Writing audio to file %s\n", opts.wav_out_file);
           openWavOutFile (&opts, &state);
           break;
         case 'B':
@@ -590,7 +589,7 @@ main (int argc, char **argv)
           break;
         case 'R':
           sscanf (optarg, "%d", &opts.resume);
-          printf ("Enabling scan resume after %i TDULC frames\n", opts.resume);
+         fprintf(stderr, "Enabling scan resume after %i TDULC frames\n", opts.resume);
           break;
         case 'f':
           if (optarg[0] == 'a')
@@ -612,7 +611,7 @@ main (int argc, char **argv)
               opts.frame_nxdn96 = 0;
               opts.frame_dmr = 0;
               opts.frame_provoice = 0;
-              printf ("Decoding only D-STAR frames.\n");
+             fprintf(stderr, "Decoding only D-STAR frames.\n");
             }
           else if (optarg[0] == 'x')
             {
@@ -623,7 +622,7 @@ main (int argc, char **argv)
               opts.frame_nxdn96 = 0;
               opts.frame_dmr = 0;
               opts.frame_provoice = 0;
-              printf ("Decoding only X2-TDMA frames.\n");
+             fprintf(stderr, "Decoding only X2-TDMA frames.\n");
             }
           else if (optarg[0] == 'p')
             {
@@ -640,9 +639,9 @@ main (int argc, char **argv)
               opts.mod_qpsk = 0;
               opts.mod_gfsk = 1;
               state.rf_mod = 2;
-              printf ("Setting symbol rate to 9600 / second\n");
-              printf ("Enabling only GFSK modulation optimizations.\n");
-              printf ("Decoding only ProVoice frames.\n");
+             fprintf(stderr, "Setting symbol rate to 9600 / second\n");
+             fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
+             fprintf(stderr, "Decoding only ProVoice frames.\n");
             }
           else if (optarg[0] == '1')
             {
@@ -653,7 +652,7 @@ main (int argc, char **argv)
               opts.frame_nxdn96 = 0;
               opts.frame_dmr = 0;
               opts.frame_provoice = 0;
-              printf ("Decoding only P25 Phase 1 frames.\n");
+             fprintf(stderr, "Decoding only P25 Phase 1 frames.\n");
             }
           else if (optarg[0] == 'i')
             {
@@ -670,9 +669,9 @@ main (int argc, char **argv)
               opts.mod_qpsk = 0;
               opts.mod_gfsk = 1;
               state.rf_mod = 2;
-              printf ("Setting symbol rate to 2400 / second\n");
-              printf ("Enabling only GFSK modulation optimizations.\n");
-              printf ("Decoding only NXDN 4800 baud frames.\n");
+             fprintf(stderr, "Setting symbol rate to 2400 / second\n");
+             fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
+             fprintf(stderr, "Decoding only NXDN 4800 baud frames.\n");
             }
           else if (optarg[0] == 'n')
             {
@@ -687,8 +686,8 @@ main (int argc, char **argv)
               opts.mod_qpsk = 0;
               opts.mod_gfsk = 1;
               state.rf_mod = 2;
-              printf ("Enabling only GFSK modulation optimizations.\n");
-              printf ("Decoding only NXDN 9600 baud frames.\n");
+             fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
+             fprintf(stderr, "Decoding only NXDN 9600 baud frames.\n");
             }
           else if (optarg[0] == 'r')
             {
@@ -699,7 +698,7 @@ main (int argc, char **argv)
               opts.frame_nxdn96 = 0;
               opts.frame_dmr = 1;
               opts.frame_provoice = 0;
-              printf ("Decoding only DMR/MOTOTRBO frames.\n");
+             fprintf(stderr, "Decoding only DMR/MOTOTRBO frames.\n");
             }
           break;
         case 'm':
@@ -716,7 +715,7 @@ main (int argc, char **argv)
               opts.mod_qpsk = 0;
               opts.mod_gfsk = 0;
               state.rf_mod = 0;
-              printf ("Enabling only C4FM modulation optimizations.\n");
+             fprintf(stderr, "Enabling only C4FM modulation optimizations.\n");
             }
           else if (optarg[0] == 'g')
             {
@@ -724,7 +723,7 @@ main (int argc, char **argv)
               opts.mod_qpsk = 0;
               opts.mod_gfsk = 1;
               state.rf_mod = 2;
-              printf ("Enabling only GFSK modulation optimizations.\n");
+             fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
             }
           else if (optarg[0] == 'q')
             {
@@ -732,7 +731,7 @@ main (int argc, char **argv)
               opts.mod_qpsk = 1;
               opts.mod_gfsk = 0;
               state.rf_mod = 1;
-              printf ("Enabling only QPSK modulation optimizations.\n");
+             fprintf(stderr, "Enabling only QPSK modulation optimizations.\n");
             }
           break;
         case 'u':
@@ -745,23 +744,23 @@ main (int argc, char **argv)
             {
               opts.uvquality = 64;
             }
-          printf ("Setting unvoice speech quality to %i waves per band.\n", opts.uvquality);
+         fprintf(stderr, "Setting unvoice speech quality to %i waves per band.\n", opts.uvquality);
           break;
         case 'x':
           if (optarg[0] == 'x')
             {
               opts.inverted_x2tdma = 0;
-              printf ("Expecting non-inverted X2-TDMA signals.\n");
+             fprintf(stderr, "Expecting non-inverted X2-TDMA signals.\n");
             }
           else if (optarg[0] == 'r')
             {
               opts.inverted_dmr = 1;
-              printf ("Expecting inverted DMR/MOTOTRBO signals.\n");
+             fprintf(stderr, "Expecting inverted DMR/MOTOTRBO signals.\n");
             }
           break;
         case 'A':
           sscanf (optarg, "%i", &opts.mod_threshold);
-          printf ("Setting C4FM/QPSK auto detection threshold to %i\n", opts.mod_threshold);
+         fprintf(stderr, "Setting C4FM/QPSK auto detection threshold to %i\n", opts.mod_threshold);
           break;
         case 'S':
           sscanf (optarg, "%i", &opts.ssize);
@@ -773,7 +772,7 @@ main (int argc, char **argv)
             {
               opts.ssize = 1;
             }
-          printf ("Setting QPSK symbol buffer to %i\n", opts.ssize);
+         fprintf(stderr, "Setting QPSK symbol buffer to %i\n", opts.ssize);
           break;
         case 'M':
           sscanf (optarg, "%i", &opts.msize);
@@ -785,7 +784,7 @@ main (int argc, char **argv)
             {
               opts.msize = 1;
             }
-          printf ("Setting QPSK Min/Max buffer to %i\n", opts.msize);
+         fprintf(stderr, "Setting QPSK Min/Max buffer to %i\n", opts.msize);
           break;
         case 'r':
           opts.playfiles = 1;
@@ -813,7 +812,7 @@ main (int argc, char **argv)
   if((strncmp(opts.audio_in_dev, "pa:", 3) == 0)
   || (strncmp(opts.audio_out_dev, "pa:", 3) == 0))
   {
-	printf("Initializing portaudio.\n");
+fprintf(stderr, "Initializing portaudio.\n");
     PaError err = Pa_Initialize();
     if( err != paNoError )
     {

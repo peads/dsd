@@ -307,7 +307,7 @@ openMbeOutFile (dsd_opts * opts, dsd_state * state)
   opts->mbe_out_f = fopen (opts->mbe_out_path, "w");
   if (opts->mbe_out_f == NULL)
     {
-      printf ("Error, couldn't open %s\n", opts->mbe_out_path);
+     fprintf(stderr, "Error, couldn't open %s\n", opts->mbe_out_path);
     }
 
   // write magic
@@ -316,95 +316,15 @@ openMbeOutFile (dsd_opts * opts, dsd_state * state)
   fflush (opts->mbe_out_f);
 }
 
-void
-openWavOutFile (dsd_opts * opts, dsd_state * state)
-{
-
- // opts->wav_out_f = fopen (opts->wav_out_file, "w");
-
+void openWavOutFile (dsd_opts *opts, dsd_state *state) {
   SF_INFO info;
   info.samplerate = 8000;
   info.channels = 1;
   info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 | SF_ENDIAN_LITTLE;
-  opts->wav_out_f = sf_open (opts->wav_out_file, SFM_WRITE, &info);
+  opts->wav_out_f = sf_open(opts->wav_out_file, SFM_WRITE, &info);
 
-  if (opts->wav_out_f == NULL)
-  {
-    printf ("Error - could not open wav output file %s\n", opts->wav_out_file);
+  if (!opts->wav_out_f) {
+   fprintf(stderr, "Error - could not open wav output file %s\n", opts->wav_out_file);
     return;
   }
-
-//  state->wav_out_bytes = 0;
-
-}
-
-void
-closeWavOutFile (dsd_opts * opts, dsd_state * state)
-{
-  sf_close(opts->wav_out_f);
-
-/*
-  int length;
-
-  if (opts->wav_out_f != NULL)
-    {
-      rewind (opts->wav_out_f);
-      length = state->wav_out_bytes;
-
-      fprintf (opts->wav_out_f, "RIFF");
-      // total length
-      fputc (((36 + length) & 0xff), opts->≈≈);
-      fputc ((((36 + length) >> 8) & 0xff), opts->wav_out_f);
-      fputc ((((36 + length) >> 16) & 0xff), opts->wav_out_f);
-      fputc ((((36 + length) >> 24) & 0xff), opts->wav_out_f);
-
-      fprintf (opts->wav_out_f, "WAVE");
-      fprintf (opts->wav_out_f, "fmt ");
-
-      // length of format chunk
-      fputc (16, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // always 0x1
-      fputc (1, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // channels
-      fputc (1, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // sample rate
-      fputc (64, opts->wav_out_f);
-      fputc (31, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // bytes per second
-      fputc (128, opts->wav_out_f);
-      fputc (62, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // block align
-      fputc (2, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // bits/sample
-      fputc (16, opts->wav_out_f);
-      fputc (0, opts->wav_out_f);
-
-      // data chunk header
-      fprintf (opts->wav_out_f, "data");
-
-      // length of data
-      fputc ((length & 0xff), opts->wav_out_f);
-      fputc (((length >> 8) & 0xff), opts->wav_out_f);
-      fputc (((length >> 16) & 0xff), opts->wav_out_f);
-      fputc (((length >> 24) & 0xff), opts->wav_out_f);
-
-      fflush (opts->wav_out_f);
-    }
-    */
 }

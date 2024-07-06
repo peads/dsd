@@ -42,23 +42,23 @@ protected:
 
       unsigned int trashed_codeword = golay24.adapt_to_codeword(hex, 6, sgp);
 
-      //printf("[%s]", hex_to_bin24(trashed_codeword));
+      //fprintf(stderr, "[%s]", hex_to_bin24(trashed_codeword));
 
       int fixed_errors = 0;
       int many_errors = golay24.decode_6(hex, sgp, &fixed_errors); // try to correct bit errors
 
       /*
-      printf(" -> ");
-      printf("[");
+      fprintf(stderr, " -> ");
+      fprintf(stderr, "[");
       for (unsigned int i=0; i<6; i++) {
-          printf("%c", hex[i]? 'X' : ' ');
+          fprintf(stderr, "%c", hex[i]? 'X' : ' ');
       }
-      printf("] ");
+      fprintf(stderr, "] ");
       if (many_errors) {
           // Signal that there were errors that couldn't get fixed, probably more than 4.
-          printf(" +4 errors");
+          fprintf(stderr, " +4 errors");
       } else {
-          printf("  %i errors", fixed_errors);
+          fprintf(stderr, "  %i errors", fixed_errors);
       }
       */
 
@@ -70,7 +70,7 @@ protected:
           EXPECT_EQ(expected_errors, fixed_errors);
       }
 
-      //printf("\n");
+      //fprintf(stderr, "\n");
   }
 
   static void check_encode(char* hex, char* expected_parity)

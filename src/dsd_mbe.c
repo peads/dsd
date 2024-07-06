@@ -88,7 +88,7 @@ void playMbeFiles(dsd_opts *opts, dsd_state *state, int argc, char **argv) {
                          state->prev_mp_enhanced);
 
         if (opts->verbose > 0) {
-            printf("playing %s\n", opts->mbe_in_file);
+           fprintf(stderr, "playing %s\n", opts->mbe_in_file);
         }
 
         switch (state->mbe_file_type) {
@@ -172,7 +172,7 @@ processMbeFrame (dsd_opts * opts, dsd_state * state, char imbe_fr[8][23], char a
 
   if (opts->errorbars == 1)
     {
-      printf ("%s", state->err_str);
+     fprintf(stderr, "%s", state->err_str);
     }
 
   state->debug_audio_errors += state->errs2;

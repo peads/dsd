@@ -2530,7 +2530,7 @@ static std::string PrintTestPartResultToString(
 static void PrintTestPartResult(const TestPartResult& test_part_result) {
   const std::string& result =
       PrintTestPartResultToString(test_part_result);
-  printf("%s\n", result.c_str());
+  fprintf(stderr, "%s\n", result.c_str());
   fflush(stdout);
   // If the test program runs in Visual Studio or a debugger, the
   // following statements add the test part result message to the Output
@@ -2657,9 +2657,9 @@ void ColoredPrintf(GTestColor color, const char* fmt, ...) {
   // Restores the text color.
   SetConsoleTextAttribute(stdout_handle, old_color_attrs);
 #else
-  printf("\033[0;3%sm", GetAnsiColorCode(color));
+  fprintf(stderr, "\033[0;3%sm", GetAnsiColorCode(color));
   vprintf(fmt, args);
-  printf("\033[m");  // Resets the terminal to default.
+  fprintf(stderr, "\033[m");  // Resets the terminal to default.
 #endif  // GTEST_OS_WINDOWS && !GTEST_OS_WINDOWS_MOBILE
   va_end(args);
 }
@@ -2674,14 +2674,14 @@ void PrintFullTestCommentIfPresent(const TestInfo& test_info) {
   const char* const value_param = test_info.value_param();
 
   if (type_param != NULL || value_param != NULL) {
-    printf(", where ");
+    fprintf(stderr, ", where ");
     if (type_param != NULL) {
-      printf("%s = %s", kTypeParamLabel, type_param);
+      fprintf(stderr, "%s = %s", kTypeParamLabel, type_param);
       if (value_param != NULL)
-        printf(" and ");
+        fprintf(stderr, " and ");
     }
     if (value_param != NULL) {
-      printf("%s = %s", kValueParamLabel, value_param);
+      fprintf(stderr, "%s = %s", kValueParamLabel, value_param);
     }
   }
 }
@@ -2693,7 +2693,7 @@ class PrettyUnitTestResultPrinter : public TestEventListener {
  public:
   PrettyUnitTestResultPrinter() {}
   static void PrintTestName(const char * test_case, const char * test) {
-    printf("%s.%s", test_case, test);
+    fprintf(stderr, "%s.%s", test_case, test);
   }
 
   // The following methods override what's in the TestEventListener class.
@@ -2719,7 +2719,7 @@ class PrettyUnitTestResultPrinter : public TestEventListener {
 void PrettyUnitTestResultPrinter::OnTestIterationStart(
     const UnitTest& unit_test, int iteration) {
   if (GTEST_FLAG(repeat) != 1)
-    printf("\nRepeating all tests (iteration %d) . . .\n\n", iteration + 1);
+    fprintf(stderr, "\nRepeating all tests (iteration %d) . . .\n\n", iteration + 1);
 
   const char* const filter = GTEST_FLAG(filter).c_str();
 
@@ -2745,7 +2745,7 @@ void PrettyUnitTestResultPrinter::OnTestIterationStart(
   }
 
   ColoredPrintf(COLOR_GREEN,  "[==========] ");
-  printf("Running %s from %s.\n",
+  fprintf(stderr, "Running %s from %s.\n",
          FormatTestCount(unit_test.test_to_run_count()).c_str(),
          FormatTestCaseCount(unit_test.test_case_to_run_count()).c_str());
   fflush(stdout);
@@ -2754,7 +2754,7 @@ void PrettyUnitTestResultPrinter::OnTestIterationStart(
 void PrettyUnitTestResultPrinter::OnEnvironmentsSetUpStart(
     const UnitTest& /*unit_test*/) {
   ColoredPrintf(COLOR_GREEN,  "[----------] ");
-  printf("Global test environment set-up.\n");
+  fprintf(stderr, "Global test environment set-up.\n");
   fflush(stdout);
 }
 
@@ -2762,11 +2762,11 @@ void PrettyUnitTestResultPrinter::OnTestCaseStart(const TestCase& test_case) {
   const std::string counts =
       FormatCountableNoun(test_case.test_to_run_count(), "test", "tests");
   ColoredPrintf(COLOR_GREEN, "[----------] ");
-  printf("%s from %s", counts.c_str(), test_case.name());
+  fprintf(stderr, "%s from %s", counts.c_str(), test_case.name());
   if (test_case.type_param() == NULL) {
-    printf("\n");
+    fprintf(stderr, "\n");
   } else {
-    printf(", where %s = %s\n", kTypeParamLabel, test_case.type_param());
+    fprintf(stderr, ", where %s = %s\n", kTypeParamLabel, test_case.type_param());
   }
   fflush(stdout);
 }
@@ -2774,7 +2774,7 @@ void PrettyUnitTestResultPrinter::OnTestCaseStart(const TestCase& test_case) {
 void PrettyUnitTestResultPrinter::OnTestStart(const TestInfo& test_info) {
   ColoredPrintf(COLOR_GREEN,  "[ RUN      ] ");
   PrintTestName(test_info.test_case_name(), test_info.name());
-  printf("\n");
+  fprintf(stderr, "\n");
   fflush(stdout);
 }
 
@@ -2801,10 +2801,10 @@ void PrettyUnitTestResultPrinter::OnTestEnd(const TestInfo& test_info) {
     PrintFullTestCommentIfPresent(test_info);
 
   if (GTEST_FLAG(print_time)) {
-    printf(" (%s ms)\n", internal::StreamableToString(
+    fprintf(stderr, " (%s ms)\n", internal::StreamableToString(
            test_info.result()->elapsed_time()).c_str());
   } else {
-    printf("\n");
+    fprintf(stderr, "\n");
   }
   fflush(stdout);
 }
@@ -2815,7 +2815,7 @@ void PrettyUnitTestResultPrinter::OnTestCaseEnd(const TestCase& test_case) {
   const std::string counts =
       FormatCountableNoun(test_case.test_to_run_count(), "test", "tests");
   ColoredPrintf(COLOR_GREEN, "[----------] ");
-  printf("%s from %s (%s ms total)\n\n",
+  fprintf(stderr, "%s from %s (%s ms total)\n\n",
          counts.c_str(), test_case.name(),
          internal::StreamableToString(test_case.elapsed_time()).c_str());
   fflush(stdout);
@@ -2824,7 +2824,7 @@ void PrettyUnitTestResultPrinter::OnTestCaseEnd(const TestCase& test_case) {
 void PrettyUnitTestResultPrinter::OnEnvironmentsTearDownStart(
     const UnitTest& /*unit_test*/) {
   ColoredPrintf(COLOR_GREEN,  "[----------] ");
-  printf("Global test environment tear-down\n");
+  fprintf(stderr, "Global test environment tear-down\n");
   fflush(stdout);
 }
 
@@ -2846,9 +2846,9 @@ void PrettyUnitTestResultPrinter::PrintFailedTests(const UnitTest& unit_test) {
         continue;
       }
       ColoredPrintf(COLOR_RED, "[  FAILED  ] ");
-      printf("%s.%s", test_case.name(), test_info.name());
+      fprintf(stderr, "%s.%s", test_case.name(), test_info.name());
       PrintFullTestCommentIfPresent(test_info);
-      printf("\n");
+      fprintf(stderr, "\n");
     }
   }
 }
@@ -2856,31 +2856,31 @@ void PrettyUnitTestResultPrinter::PrintFailedTests(const UnitTest& unit_test) {
 void PrettyUnitTestResultPrinter::OnTestIterationEnd(const UnitTest& unit_test,
                                                      int /*iteration*/) {
   ColoredPrintf(COLOR_GREEN,  "[==========] ");
-  printf("%s from %s ran.",
+  fprintf(stderr, "%s from %s ran.",
          FormatTestCount(unit_test.test_to_run_count()).c_str(),
          FormatTestCaseCount(unit_test.test_case_to_run_count()).c_str());
   if (GTEST_FLAG(print_time)) {
-    printf(" (%s ms total)",
+    fprintf(stderr, " (%s ms total)",
            internal::StreamableToString(unit_test.elapsed_time()).c_str());
   }
-  printf("\n");
+  fprintf(stderr, "\n");
   ColoredPrintf(COLOR_GREEN,  "[  PASSED  ] ");
-  printf("%s.\n", FormatTestCount(unit_test.successful_test_count()).c_str());
+  fprintf(stderr, "%s.\n", FormatTestCount(unit_test.successful_test_count()).c_str());
 
   int num_failures = unit_test.failed_test_count();
   if (!unit_test.Passed()) {
     const int failed_test_count = unit_test.failed_test_count();
     ColoredPrintf(COLOR_RED,  "[  FAILED  ] ");
-    printf("%s, listed below:\n", FormatTestCount(failed_test_count).c_str());
+    fprintf(stderr, "%s, listed below:\n", FormatTestCount(failed_test_count).c_str());
     PrintFailedTests(unit_test);
-    printf("\n%2d FAILED %s\n", num_failures,
+    fprintf(stderr, "\n%2d FAILED %s\n", num_failures,
                         num_failures == 1 ? "TEST" : "TESTS");
   }
 
   int num_disabled = unit_test.reportable_disabled_test_count();
   if (num_disabled && !GTEST_FLAG(also_run_disabled_tests)) {
     if (!num_failures) {
-      printf("\n");  // Add a spacer if no FAILURE banner is displayed.
+      fprintf(stderr, "\n");  // Add a spacer if no FAILURE banner is displayed.
     }
     ColoredPrintf(COLOR_YELLOW,
                   "  YOU HAVE %d DISABLED %s\n\n",
@@ -4079,7 +4079,7 @@ void UnitTestImpl::ConfigureXmlOutput() {
     listeners()->SetDefaultXmlGenerator(new XmlUnitTestResultPrinter(
         UnitTestOptions::GetAbsolutePathToOutputFile().c_str()));
   } else if (output_format != "") {
-    printf("WARNING: unrecognized output format \"%s\" ignored.\n",
+    fprintf(stderr, "WARNING: unrecognized output format \"%s\" ignored.\n",
            output_format.c_str());
     fflush(stdout);
   }
@@ -4096,7 +4096,7 @@ void UnitTestImpl::ConfigureStreamingOutput() {
       listeners()->Append(new StreamingListener(target.substr(0, pos),
                                                 target.substr(pos+1)));
     } else {
-      printf("WARNING: unrecognized streaming target \"%s\" ignored.\n",
+      fprintf(stderr, "WARNING: unrecognized streaming target \"%s\" ignored.\n",
              target.c_str());
       fflush(stdout);
     }
@@ -4222,7 +4222,7 @@ static void TearDownEnvironment(Environment* env) { env->TearDown(); }
 bool UnitTestImpl::RunAllTests() {
   // Makes sure InitGoogleTest() was called.
   if (!GTestIsInitialized()) {
-    printf("%s",
+    fprintf(stderr, "%s",
            "\nThis test program did NOT call ::testing::InitGoogleTest "
            "before calling RUN_ALL_TESTS().  Please fix it.\n");
     return false;
@@ -4513,14 +4513,14 @@ static void PrintOnOneLine(const char* str, int max_length) {
   if (str != NULL) {
     for (int i = 0; *str != '\0'; ++str) {
       if (i >= max_length) {
-        printf("...");
+        fprintf(stderr, "...");
         break;
       }
       if (*str == '\n') {
-        printf("\\n");
+        fprintf(stderr, "\\n");
         i += 2;
       } else {
-        printf("%c", *str);
+        fprintf(stderr, "%c", *str);
         ++i;
       }
     }
@@ -4542,23 +4542,23 @@ void UnitTestImpl::ListTestsMatchingFilter() {
       if (test_info->matches_filter_) {
         if (!printed_test_case_name) {
           printed_test_case_name = true;
-          printf("%s.", test_case->name());
+          fprintf(stderr, "%s.", test_case->name());
           if (test_case->type_param() != NULL) {
-            printf("  # %s = ", kTypeParamLabel);
+            fprintf(stderr, "  # %s = ", kTypeParamLabel);
             // We print the type parameter on a single line to make
             // the output easy to parse by a program.
             PrintOnOneLine(test_case->type_param(), kMaxParamLength);
           }
-          printf("\n");
+          fprintf(stderr, "\n");
         }
-        printf("  %s", test_info->name());
+        fprintf(stderr, "  %s", test_info->name());
         if (test_info->value_param() != NULL) {
-          printf("  # %s = ", kValueParamLabel);
+          fprintf(stderr, "  # %s = ", kValueParamLabel);
           // We print the value parameter on a single line to make the
           // output easy to parse by a program.
           PrintOnOneLine(test_info->value_param(), kMaxParamLength);
         }
-        printf("\n");
+        fprintf(stderr, "\n");
       }
     }
   }
