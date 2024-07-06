@@ -21,58 +21,58 @@ void
 processDMRdata (dsd_opts * opts, dsd_state * state)
 {
 
-  int i, dibit;
-  int *dibit_p;
-  char sync[25];
-  char syncdata[25];
-  char cachdata[13];
-  char cc[5];
-  char bursttype[5];
+    int i, dibit;
+    int *dibit_p;
+    char sync[25];
+    char syncdata[25];
+    char cachdata[13];
+    char cc[5];
+    char bursttype[5];
 
 #ifdef DMR_DUMP
-  int k;
+    int k;
   char syncbits[49];
   char cachbits[25];
 #endif
 
-  cc[4] = 0;
-  bursttype[4] = 0;
+    cc[4] = 0;
+    bursttype[4] = 0;
 
-  dibit_p = state->dibit_buf_p - 90;
+    dibit_p = state->dibit_buf_p - 90;
 
-  // CACH
-  for (i = 0; i < 12; i++)
+    // CACH
+    for (i = 0; i < 12; i++)
     {
-      dibit = *dibit_p;
-      dibit_p++;
-      if (opts->inverted_dmr == 1)
+        dibit = *dibit_p;
+        dibit_p++;
+        if (opts->inverted_dmr == 1)
         {
-          dibit = (dibit ^ 2);
+            dibit = (dibit ^ 2);
         }
-      cachdata[i] = dibit;
-      if (i == 2)
+        cachdata[i] = dibit;
+        if (i == 2)
         {
-          state->currentslot = (1 & (dibit >> 1));      // bit 1
-          if (state->currentslot == 0)
+            state->currentslot = (1 & (dibit >> 1));      // bit 1
+            if (state->currentslot == 0)
             {
-              state->slot0light[0] = '[';
-              state->slot0light[6] = ']';
-              state->slot1light[0] = ' ';
-              state->slot1light[6] = ' ';
+                state->slot0light[0] = '[';
+                state->slot0light[6] = ']';
+                state->slot1light[0] = ' ';
+                state->slot1light[6] = ' ';
             }
-          else
+            else
             {
-              state->slot1light[0] = '[';
-              state->slot1light[6] = ']';
-              state->slot0light[0] = ' ';
-              state->slot0light[6] = ' ';
+                state->slot1light[0] = '[';
+                state->slot1light[6] = ']';
+                state->slot0light[0] = ' ';
+                state->slot0light[6] = ' ';
             }
         }
     }
-  cachdata[12] = 0;
+    cachdata[12] = 0;
 
 #ifdef DMR_DUMP
-  k = 0;
+    k = 0;
   for (i = 0; i < 12; i++)
     {
       dibit = cachdata[i];
@@ -82,118 +82,118 @@ processDMRdata (dsd_opts * opts, dsd_state * state)
       k++;
     }
   cachbits[24] = 0;
-  printf ("%s ", cachbits);
+ fprintf(stderr, "%s ", cachbits);
 #endif
 
-  // current slot
-  dibit_p += 49;
+    // current slot
+    dibit_p += 49;
 
-  // slot type
-  dibit = *dibit_p;
-  dibit_p++;
-  if (opts->inverted_dmr == 1)
+    // slot type
+    dibit = *dibit_p;
+    dibit_p++;
+    if (opts->inverted_dmr == 1)
     {
-      dibit = (dibit ^ 2);
+        dibit = (dibit ^ 2);
     }
-  cc[0] = (1 & (dibit >> 1)) + 48;      // bit 1
-  cc[1] = (1 & dibit) + 48;     // bit 0
+    cc[0] = (1 & (dibit >> 1)) + 48;      // bit 1
+    cc[1] = (1 & dibit) + 48;     // bit 0
 
-  dibit = *dibit_p;
-  dibit_p++;
-  if (opts->inverted_dmr == 1)
+    dibit = *dibit_p;
+    dibit_p++;
+    if (opts->inverted_dmr == 1)
     {
-      dibit = (dibit ^ 2);
+        dibit = (dibit ^ 2);
     }
-  cc[2] = (1 & (dibit >> 1)) + 48;      // bit 1
-  cc[3] = (1 & dibit) + 48;     // bit 0
+    cc[2] = (1 & (dibit >> 1)) + 48;      // bit 1
+    cc[3] = (1 & dibit) + 48;     // bit 0
 
-  dibit = *dibit_p;
-  dibit_p++;
-  if (opts->inverted_dmr == 1)
+    dibit = *dibit_p;
+    dibit_p++;
+    if (opts->inverted_dmr == 1)
     {
-      dibit = (dibit ^ 2);
+        dibit = (dibit ^ 2);
     }
-  bursttype[0] = (1 & (dibit >> 1)) + 48;       // bit 1
-  bursttype[1] = (1 & dibit) + 48;      // bit 0
+    bursttype[0] = (1 & (dibit >> 1)) + 48;       // bit 1
+    bursttype[1] = (1 & dibit) + 48;      // bit 0
 
-  dibit = *dibit_p;
-  dibit_p++;
-  if (opts->inverted_dmr == 1)
+    dibit = *dibit_p;
+    dibit_p++;
+    if (opts->inverted_dmr == 1)
     {
-      dibit = (dibit ^ 2);
+        dibit = (dibit ^ 2);
     }
-  bursttype[2] = (1 & (dibit >> 1)) + 48;       // bit 1
-  bursttype[3] = (1 & dibit) + 48;      // bit 0
+    bursttype[2] = (1 & (dibit >> 1)) + 48;       // bit 1
+    bursttype[3] = (1 & dibit) + 48;      // bit 0
 
-  // parity bit
-  dibit_p++;
+    // parity bit
+    dibit_p++;
 
-  if (strcmp (bursttype, "0000") == 0)
+    if (strcmp (bursttype, "0000") == 0)
     {
-      sprintf (state->fsubtype, " PI Header    ");
+        sprintf (state->fsubtype, " PI Header    ");
     }
-  else if (strcmp (bursttype, "0001") == 0)
+    else if (strcmp (bursttype, "0001") == 0)
     {
-      sprintf (state->fsubtype, " VOICE Header ");
+        sprintf (state->fsubtype, " VOICE Header ");
     }
-  else if (strcmp (bursttype, "0010") == 0)
+    else if (strcmp (bursttype, "0010") == 0)
     {
-      sprintf (state->fsubtype, " TLC          ");
+        sprintf (state->fsubtype, " TLC          ");
     }
-  else if (strcmp (bursttype, "0011") == 0)
+    else if (strcmp (bursttype, "0011") == 0)
     {
-      sprintf (state->fsubtype, " CSBK         ");
+        sprintf (state->fsubtype, " CSBK         ");
     }
-  else if (strcmp (bursttype, "0100") == 0)
+    else if (strcmp (bursttype, "0100") == 0)
     {
-      sprintf (state->fsubtype, " MBC Header   ");
+        sprintf (state->fsubtype, " MBC Header   ");
     }
-  else if (strcmp (bursttype, "0101") == 0)
+    else if (strcmp (bursttype, "0101") == 0)
     {
-      sprintf (state->fsubtype, " MBC          ");
+        sprintf (state->fsubtype, " MBC          ");
     }
-  else if (strcmp (bursttype, "0110") == 0)
+    else if (strcmp (bursttype, "0110") == 0)
     {
-      sprintf (state->fsubtype, " DATA Header  ");
+        sprintf (state->fsubtype, " DATA Header  ");
     }
-  else if (strcmp (bursttype, "0111") == 0)
+    else if (strcmp (bursttype, "0111") == 0)
     {
-      sprintf (state->fsubtype, " RATE 1/2 DATA");
+        sprintf (state->fsubtype, " RATE 1/2 DATA");
     }
-  else if (strcmp (bursttype, "1000") == 0)
+    else if (strcmp (bursttype, "1000") == 0)
     {
-      sprintf (state->fsubtype, " RATE 3/4 DATA");
+        sprintf (state->fsubtype, " RATE 3/4 DATA");
     }
-  else if (strcmp (bursttype, "1001") == 0)
+    else if (strcmp (bursttype, "1001") == 0)
     {
-      sprintf (state->fsubtype, " Slot idle    ");
+        sprintf (state->fsubtype, " Slot idle    ");
     }
-  else if (strcmp (bursttype, "1010") == 0)
+    else if (strcmp (bursttype, "1010") == 0)
     {
-      sprintf (state->fsubtype, " Rate 1 DATA  ");
+        sprintf (state->fsubtype, " Rate 1 DATA  ");
     }
-  else
+    else
     {
-      sprintf (state->fsubtype, "              ");
+        sprintf (state->fsubtype, "              ");
     }
 
-  // signaling data or sync
-  for (i = 0; i < 24; i++)
+    // signaling data or sync
+    for (i = 0; i < 24; i++)
     {
-      dibit = *dibit_p;
-      dibit_p++;
-      if (opts->inverted_dmr == 1)
+        dibit = *dibit_p;
+        dibit_p++;
+        if (opts->inverted_dmr == 1)
         {
-          dibit = (dibit ^ 2);
+            dibit = (dibit ^ 2);
         }
-      syncdata[i] = dibit;
-      sync[i] = (dibit | 1) + 48;
+        syncdata[i] = dibit;
+        sync[i] = (dibit | 1) + 48;
     }
-  sync[24] = 0;
-  syncdata[24] = 0;
+    sync[24] = 0;
+    syncdata[24] = 0;
 
 #ifdef DMR_DUMP
-  k = 0;
+    k = 0;
   for (i = 0; i < 24; i++)
     {
       dibit = syncdata[i];
@@ -203,38 +203,38 @@ processDMRdata (dsd_opts * opts, dsd_state * state)
       k++;
     }
   syncbits[48] = 0;
-  printf ("%s ", syncbits);
+ fprintf(stderr, "%s ", syncbits);
 #endif
 
-  if ((strcmp (sync, DMR_BS_DATA_SYNC) == 0) || (strcmp (sync, DMR_MS_DATA_SYNC) == 0))
+    if ((strcmp (sync, DMR_BS_DATA_SYNC) == 0) || (strcmp (sync, DMR_MS_DATA_SYNC) == 0))
     {
-      if (state->currentslot == 0)
+        if (state->currentslot == 0)
         {
-          sprintf (state->slot0light, "[slot0]");
+            sprintf (state->slot0light, "[slot0]");
         }
-      else
+        else
         {
-          sprintf (state->slot1light, "[slot1]");
+            sprintf (state->slot1light, "[slot1]");
         }
     }
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-      printf ("%s %s ", state->slot0light, state->slot1light);
+        fprintf(stderr, "%s %s ", state->slot0light, state->slot1light);
     }
 
-  // current slot second half, cach, next slot 1st half
-  skipDibit (opts, state, 120);
+    // current slot second half, cach, next slot 1st half
+    skipDibit (opts, state, 120);
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-      if (strcmp (state->fsubtype, "              ") == 0)
+        if (strcmp (state->fsubtype, "              ") == 0)
         {
-          printf (" Unknown burst type: %s\n", bursttype);
+            fprintf(stderr, " Unknown burst type: %s\n", bursttype);
         }
-      else
+        else
         {
-          printf ("%s\n", state->fsubtype);
+            fprintf(stderr, "%s\n", state->fsubtype);
         }
     }
 }

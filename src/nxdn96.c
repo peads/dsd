@@ -4,121 +4,121 @@
 void
 processNXDN96 (dsd_opts * opts, dsd_state * state)
 {
-  int i, j, k, dibit;
+    int i, j, k, dibit;
 
-  char ambe_fr[4][24];
-  const int *w, *x, *y, *z;
+    char ambe_fr[4][24];
+    const int *w, *x, *y, *z;
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-      printf ("VOICE e:");
+        fprintf(stderr, "VOICE e:");
     }
 
 #ifdef NXDN_DUMP
-  printf ("\n");
+    fprintf(stderr, "\n");
 #endif
 
-  for (k = 0; k < 4; k++)
+    for (k = 0; k < 4; k++)
     {
-      for (i = 0; i < 222; i++)
+        for (i = 0; i < 222; i++)
         {
-          dibit = getDibit (opts, state);
+            dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-          printf ("%c", dibit + 48);
+            fprintf(stderr, "%c", dibit + 48);
 #endif
         }
 #ifdef NXDN_DUMP
-      printf (" ");
+        fprintf(stderr, " ");
 #endif
 
-      if (k < 3)
+        if (k < 3)
         {
-          for (j = 0; j < 4; j++)
+            for (j = 0; j < 4; j++)
             {
-              w = nW;
-              x = nX;
-              y = nY;
-              z = nZ;
-              for (i = 0; i < 36; i++)
+                w = nW;
+                x = nX;
+                y = nY;
+                z = nZ;
+                for (i = 0; i < 36; i++)
                 {
-                  dibit = getDibit (opts, state);
+                    dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-                  printf ("%c", dibit + 48);
+                    fprintf(stderr, "%c", dibit + 48);
 #endif
-                  ambe_fr[*w][*x] = (1 & (dibit >> 1)); // bit 1
-                  ambe_fr[*y][*z] = (1 & dibit);        // bit 0
-                  w++;
-                  x++;
-                  y++;
-                  z++;
+                    ambe_fr[*w][*x] = (1 & (dibit >> 1)); // bit 1
+                    ambe_fr[*y][*z] = (1 & dibit);        // bit 0
+                    w++;
+                    x++;
+                    y++;
+                    z++;
                 }
-              processMbeFrame (opts, state, NULL, ambe_fr, NULL);
+                processMbeFrame (opts, state, NULL, ambe_fr, NULL);
 #ifdef NXDN_DUMP
-              printf (" ");
+                fprintf(stderr, " ");
 #endif
             }
         }
-      else
+        else
         {
-          for (j = 0; j < 3; j++)       // we skip the last voice frame until frame sync can work with < 24 symbols
+            for (j = 0; j < 3; j++)       // we skip the last voice frame until frame sync can work with < 24 symbols
             {
-              w = nW;
-              x = nX;
-              y = nY;
-              z = nZ;
-              for (i = 0; i < 36; i++)
+                w = nW;
+                x = nX;
+                y = nY;
+                z = nZ;
+                for (i = 0; i < 36; i++)
                 {
-                  dibit = getDibit (opts, state);
+                    dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-                  printf ("%c", dibit + 48);
+                    fprintf(stderr, "%c", dibit + 48);
 #endif
-                  ambe_fr[*w][*x] = (1 & (dibit >> 1)); // bit 1
-                  ambe_fr[*y][*z] = (1 & dibit);        // bit 0
-                  w++;
-                  x++;
-                  y++;
-                  z++;
+                    ambe_fr[*w][*x] = (1 & (dibit >> 1)); // bit 1
+                    ambe_fr[*y][*z] = (1 & dibit);        // bit 0
+                    w++;
+                    x++;
+                    y++;
+                    z++;
                 }
-              processMbeFrame (opts, state, NULL, ambe_fr, NULL);
+                processMbeFrame (opts, state, NULL, ambe_fr, NULL);
 #ifdef NXDN_DUMP
-              printf (" ");
+                fprintf(stderr, " ");
 #endif
             }
         }
 
-      if (k < 3)
+        if (k < 3)
         {
-          for (i = 0; i < 18; i++)
+            for (i = 0; i < 18; i++)
             {
-              dibit = getDibit (opts, state);
+                dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-              printf ("%c", dibit + 48);
+                fprintf(stderr, "%c", dibit + 48);
 #endif
             }
 #ifdef NXDN_DUMP
-          printf (" ");
+            fprintf(stderr, " ");
 #endif
 
         }
-      else
+        else
         {
-          for (i = 0; i < 30; i++)
+            for (i = 0; i < 30; i++)
             {
-              dibit = getDibit (opts, state);
+                dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-              printf ("%c", dibit + 48);
+                fprintf(stderr, "%c", dibit + 48);
 #endif
             }
         }
     }
 
 #ifdef NXDN_DUMP
-  printf ("\n");
+    fprintf(stderr, "\n");
 #endif
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-      printf ("\n");
+        fprintf(stderr, "\n");
     }
 
 }

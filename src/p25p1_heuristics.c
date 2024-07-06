@@ -249,7 +249,7 @@ static void debug_log_pdf(P25Heuristics* heuristics, int previous_dibit, int ana
         pdfs[i] = evaluate_pdf(&(heuristics->symbols[previous_dibit][i]), analog_value);
     }
 
-    printf("v: %i, (%e, %e, %e, %e)\n", analog_value, pdfs[0], pdfs[1], pdfs[2], pdfs[3]);
+    fprintf(stderr, "v: %i, (%e, %e, %e, %e)\n", analog_value, pdfs[0], pdfs[1], pdfs[2], pdfs[3]);
 }
 
 int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, int analog_value, int* dibit)
@@ -263,12 +263,12 @@ int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, i
     int use_prev_dibit = use_previous_dibit(rf_mod);
 
     if (use_prev_dibit == 0)
-      {
+    {
         // Ignore
         previous_dibit = 0;
-      }
+    }
 #else
-	// Use previous_dibit as it comes.
+    // Use previous_dibit as it comes.
 #endif
 
     valid = 1;
@@ -320,43 +320,43 @@ static void debug_print_symbol_heuristics(int previous_dibit, int dibit, SymbolH
 
     n = sh->count;
     if (n == 0)
-      {
+    {
         mean = 0;
         sd = 0;
-      }
+    }
     else
-      {
+    {
         mean = sh->sum/n;
         sd = sqrtf(sh->var_sum / ((float) n));
-      }
-    printf("%i%i: count: %2i mean: % 10.2f sd: % 10.2f", previous_dibit, dibit, sh->count, mean, sd);
+    }
+    fprintf(stderr, "%i%i: count: %2i mean: % 10.2f sd: % 10.2f", previous_dibit, dibit, sh->count, mean, sd);
     /*
-    printf("(");
+   fprintf(stderr, "(");
     for (k=0; k<n; k++)
       {
         if (k != 0)
           {
-            printf(", ");
+           fprintf(stderr, ", ");
           }
-        printf("%i", sh->values[k]);
+        fprintf(stderr, "%i", sh->values[k]);
       }
-    printf(")");
+   fprintf(stderr, ")");
     */
-    printf("\n");
+    fprintf(stderr, "\n");
 
 }
 
 void debug_print_heuristics(P25Heuristics* heuristics)
 {
-  int i,j;
+    int i,j;
 
-  printf("\n");
+    fprintf(stderr, "\n");
 
-  for(i=0; i<4; i++)
+    for(i=0; i<4; i++)
     {
-      for(j=0; j<4; j++)
+        for(j=0; j<4; j++)
         {
-          debug_print_symbol_heuristics(i, j, &(heuristics->symbols[i][j]));
+            debug_print_symbol_heuristics(i, j, &(heuristics->symbols[i][j]));
         }
     }
 }

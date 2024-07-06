@@ -69,14 +69,14 @@ TEST(ReedSolomonTest, Test1)
     rs.decode(recd, output); /* recd[] is returned in polynomial form */
 
     /*
-    printf("Results for Reed-Solomon code (n=%3d, k=%3d, t= %3d)\n\n", nn, kk, tt);
-    printf("  i  recd[i](decoded)\n");
+    fprintf(stderr, "Results for Reed-Solomon code (n=%3d, k=%3d, t= %3d)\n\n", nn, kk, tt);
+    fprintf(stderr, "  i  recd[i](decoded)\n");
     for (int i = 0; i < nn; i++) {
         char b[9];
         byte_to_binary(b, output[i]);
-        printf("%3d    [%s]\n", i, b);
+        fprintf(stderr, "%3d    [%s]\n", i, b);
     }
-    printf("\n");
+    fprintf(stderr, "\n");
     */
 
     EXPECT_THAT(expected, testing::ElementsAreArray(output, 63));

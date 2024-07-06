@@ -1,7 +1,21 @@
+cmake_minimum_required(VERSION 2.8.12)
 project(dsd)
-cmake_minimum_required(VERSION 2.8.11)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fno-dwarf2-cfi-asm -fno-asynchronous-unwind-tables -fomit-frame-pointer -ftree-vectorize")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-dwarf2-cfi-asm -fno-asynchronous-unwind-tables -fomit-frame-pointer -ftree-vectorize")
+
+include(TargetArch)
+target_architecture(TARGET_ARCH)
+option(NATIVE OFF)
+if (NATIVE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -mtune=native")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native")
+    if (TARGET_ARCH STREQUAL "aarch64")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=native")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
+    endif()
+endif()
 
 include(git_revision)
 git_describe(GIT_TAG)
@@ -43,7 +57,7 @@ if (HELP2MAN_FOUND)
             --version-string=${GIT_TAG}
             -o ${CMAKE_CURRENT_BINARY_DIR}/dsd.1
             --no-info
-            $<TARGET_FILE:dsd> 
+            $<TARGET_FILE:dsd>
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dsd.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
@@ -63,3 +77,6 @@ if (NOT DISABLE_TEST)
     enable_testing()
     add_subdirectory(test)
 endif()
+
+message("-- CMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
+message("-- CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
