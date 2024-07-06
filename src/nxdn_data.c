@@ -3,34 +3,34 @@
 void
 processNXDNData (dsd_opts * opts, dsd_state * state)
 {
-  int i, dibit;
+    int i, dibit;
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-     fprintf(stderr, "DATA    ");
+        fprintf(stderr, "DATA    ");
     }
 
-  for (i = 0; i < 30; i++)
+    for (i = 0; i < 30; i++)
     {
-      dibit = getDibit (opts, state);
+        dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-     fprintf(stderr, "%c", dibit + 48);
+        fprintf(stderr, "%c", dibit + 48);
 #endif
     }
 #ifdef NXDN_DUMP
- fprintf(stderr, " ");
+    fprintf(stderr, " ");
 #endif
 
-  for (i = 0; i < 144; i++)
+    for (i = 0; i < 144; i++)
     {
-      dibit = getDibit (opts, state);
+        dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-     fprintf(stderr, "%c", dibit + 48);
+        fprintf(stderr, "%c", dibit + 48);
 #endif
     }
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-     fprintf(stderr, "\n");
+        fprintf(stderr, "\n");
     }
 }

@@ -38,7 +38,7 @@ int check_and_fix_reedsolomon_24_12_13(char* data, char* parity)
     int irrecoverable_error = reed_solomon_24_12_13.decode(data, parity);
 
 #ifdef CHECK_LDU_DEBUG
-   fprintf(stderr, "Results for Reed-Solomon code (24,12,13)\n\n");
+    fprintf(stderr, "Results for Reed-Solomon code (24,12,13)\n\n");
     if (irrecoverable_error == 0) {
        fprintf(stderr, "  i  original fixed\n");
         for (int i = 0; i < 12; i++) {
@@ -88,7 +88,7 @@ int check_and_fix_reedsolomon_24_16_9(char* data, char* parity)
     int irrecoverable_error = reed_solomon_24_16_9.decode(data, parity);
 
 #ifdef CHECK_LDU_DEBUG
-   fprintf(stderr, "Results for Reed-Solomon code (24,16,9)\n\n");
+    fprintf(stderr, "Results for Reed-Solomon code (24,16,9)\n\n");
     if (irrecoverable_error == 0) {
        fprintf(stderr, "  i  original fixed\n");
         for (int i = 0; i < 16; i++) {

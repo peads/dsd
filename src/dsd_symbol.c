@@ -20,215 +20,215 @@
 int
 getSymbol (dsd_opts * opts, dsd_state * state, int have_sync)
 {
-  short sample;
-  int i, sum, symbol, count;
-  ssize_t result;
+    short sample;
+    int i, sum, symbol, count;
+    ssize_t result;
 
-  sum = 0;
-  count = 0;
-  for (i = 0; i < state->samplesPerSymbol; i++)
+    sum = 0;
+    count = 0;
+    for (i = 0; i < state->samplesPerSymbol; i++)
     {
-      // timing control
-      if ((i == 0) && (have_sync == 0))
+        // timing control
+        if ((i == 0) && (have_sync == 0))
         {
-          if (state->samplesPerSymbol == 20)
+            if (state->samplesPerSymbol == 20)
             {
-              if ((state->jitter >= 7) && (state->jitter <= 10))
+                if ((state->jitter >= 7) && (state->jitter <= 10))
                 {
-                  i--;
+                    i--;
                 }
-              else if ((state->jitter >= 11) && (state->jitter <= 14))
+                else if ((state->jitter >= 11) && (state->jitter <= 14))
                 {
-                  i++;
+                    i++;
                 }
             }
-          else if (state->rf_mod == 1)
+            else if (state->rf_mod == 1)
             {
-              if ((state->jitter >= 0) && (state->jitter < state->symbolCenter))
+                if ((state->jitter >= 0) && (state->jitter < state->symbolCenter))
                 {
-                  i++;          // fall back
+                    i++;          // fall back
                 }
-              else if ((state->jitter > state->symbolCenter) && (state->jitter < 10))
+                else if ((state->jitter > state->symbolCenter) && (state->jitter < 10))
                 {
-                  i--;          // catch up
+                    i--;          // catch up
                 }
             }
-          else if (state->rf_mod == 2)
+            else if (state->rf_mod == 2)
             {
-              if ((state->jitter >= state->symbolCenter - 1) && (state->jitter <= state->symbolCenter))
+                if ((state->jitter >= state->symbolCenter - 1) && (state->jitter <= state->symbolCenter))
                 {
-                  i--;
+                    i--;
                 }
-              else if ((state->jitter >= state->symbolCenter + 1) && (state->jitter <= state->symbolCenter + 2))
+                else if ((state->jitter >= state->symbolCenter + 1) && (state->jitter <= state->symbolCenter + 2))
                 {
-                  i++;
+                    i++;
                 }
             }
-          else if (state->rf_mod == 0)
+            else if (state->rf_mod == 0)
             {
-              if ((state->jitter > 0) && (state->jitter <= state->symbolCenter))
+                if ((state->jitter > 0) && (state->jitter <= state->symbolCenter))
                 {
-                  i--;          // catch up
+                    i--;          // catch up
                 }
-              else if ((state->jitter > state->symbolCenter) && (state->jitter < state->samplesPerSymbol))
+                else if ((state->jitter > state->symbolCenter) && (state->jitter < state->samplesPerSymbol))
                 {
-                  i++;          // fall back
+                    i++;          // fall back
                 }
             }
-          state->jitter = -1;
+            state->jitter = -1;
         }
 
-      // Read the new sample from the input
-      if(opts->audio_in_type == 0) {
-          result = read (opts->audio_in_fd, &sample, 2);
-      }
-      else if (opts->audio_in_type == 1) {
-          result = sf_read_short(opts->audio_in_file, &sample, 1);
-          if(result == 0) {
-              cleanupAndExit (opts, state);
-          }
-      }
-	  else
-	  {
+        // Read the new sample from the input
+        if(opts->audio_in_type == 0) {
+            result = read (opts->audio_in_fd, &sample, 2);
+        }
+        else if (opts->audio_in_type == 1) {
+            result = sf_read_short(opts->audio_in_file, &sample, 1);
+            if(result == 0) {
+                cleanupAndExit (opts, state);
+            }
+        }
+        else
+        {
 #ifdef USE_PORTAUDIO
-		PaError err = Pa_ReadStream( opts->audio_in_pa_stream, &sample, 1 );
-		if( err != paNoError )
-		{
-    			fprintf( stderr, "An error occured while using the portaudio input stream\n" );
-    			fprintf( stderr, "Error number: %d\n", err );
-    			fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
-		}
+            PaError err = Pa_ReadStream( opts->audio_in_pa_stream, &sample, 1 );
+            if( err != paNoError )
+            {
+                fprintf( stderr, "An error occured while using the portaudio input stream\n" );
+                fprintf( stderr, "Error number: %d\n", err );
+                fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+            }
 #endif
-	  }
+        }
 
 #ifdef TRACE_DSD
-      state->debug_sample_index++;
+        state->debug_sample_index++;
 #endif
 
-      //fprintf(stderr, "res: %zd\n, offset: %lld", result, sf_seek(opts->audio_in_file, 0, SEEK_CUR));
-      if (opts->use_cosine_filter)
+        //fprintf(stderr, "res: %zd\n, offset: %lld", result, sf_seek(opts->audio_in_file, 0, SEEK_CUR));
+        if (opts->use_cosine_filter)
         {
-          if (state->lastsynctype >= 10 && state->lastsynctype <= 13)
-              sample = dmr_filter(sample);
-          else if (state->lastsynctype == 8 || state->lastsynctype == 9 ||
-                 state->lastsynctype == 16 || state->lastsynctype == 17)
+            if (state->lastsynctype >= 10 && state->lastsynctype <= 13)
+                sample = dmr_filter(sample);
+            else if (state->lastsynctype == 8 || state->lastsynctype == 9 ||
+                     state->lastsynctype == 16 || state->lastsynctype == 17)
             {
-              if(state->samplesPerSymbol == 20)
+                if(state->samplesPerSymbol == 20)
                 {
-                  sample = nxdn_filter(sample);
+                    sample = nxdn_filter(sample);
                 }
-              else // the 12.5KHz NXDN filter is the same as the DMR filter
+                else // the 12.5KHz NXDN filter is the same as the DMR filter
                 {
-                  sample = dmr_filter(sample);
+                    sample = dmr_filter(sample);
                 }
             }
         }
 
-      if ((sample > state->max) && (have_sync == 1) && (state->rf_mod == 0))
+        if ((sample > state->max) && (have_sync == 1) && (state->rf_mod == 0))
         {
-          sample = state->max;
+            sample = state->max;
         }
-      else if ((sample < state->min) && (have_sync == 1) && (state->rf_mod == 0))
+        else if ((sample < state->min) && (have_sync == 1) && (state->rf_mod == 0))
         {
-          sample = state->min;
+            sample = state->min;
         }
 
-      if (sample > state->center)
+        if (sample > state->center)
         {
-          if (state->lastsample < state->center)
+            if (state->lastsample < state->center)
             {
-              state->numflips += 1;
+                state->numflips += 1;
             }
-          if (sample > (state->maxref * 1.25))
+            if (sample > (state->maxref * 1.25))
             {
-              if (state->lastsample < (state->maxref * 1.25))
+                if (state->lastsample < (state->maxref * 1.25))
                 {
-                  state->numflips += 1;
+                    state->numflips += 1;
                 }
-              if ((state->jitter < 0) && (state->rf_mod == 1))
+                if ((state->jitter < 0) && (state->rf_mod == 1))
                 {               // first spike out of place
-                  state->jitter = i;
+                    state->jitter = i;
                 }
-              if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
+                if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
                 {
-                 fprintf(stderr, "O");
+                    fprintf(stderr, "O");
                 }
             }
-          else
+            else
             {
-              if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
+                if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
                 {
-                 fprintf(stderr, "+");
+                    fprintf(stderr, "+");
                 }
-              if ((state->jitter < 0) && (state->lastsample < state->center) && (state->rf_mod != 1))
+                if ((state->jitter < 0) && (state->lastsample < state->center) && (state->rf_mod != 1))
                 {               // first transition edge
-                  state->jitter = i;
+                    state->jitter = i;
                 }
             }
         }
-      else
+        else
         {                       // sample < 0
-          if (state->lastsample > state->center)
+            if (state->lastsample > state->center)
             {
-              state->numflips += 1;
+                state->numflips += 1;
             }
-          if (sample < (state->minref * 1.25))
+            if (sample < (state->minref * 1.25))
             {
-              if (state->lastsample > (state->minref * 1.25))
+                if (state->lastsample > (state->minref * 1.25))
                 {
-                  state->numflips += 1;
+                    state->numflips += 1;
                 }
-              if ((state->jitter < 0) && (state->rf_mod == 1))
+                if ((state->jitter < 0) && (state->rf_mod == 1))
                 {               // first spike out of place
-                  state->jitter = i;
+                    state->jitter = i;
                 }
-              if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
+                if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
                 {
-                 fprintf(stderr, "X");
+                    fprintf(stderr, "X");
                 }
             }
-          else
+            else
             {
-              if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
+                if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
                 {
-                 fprintf(stderr, "-");
+                    fprintf(stderr, "-");
                 }
-              if ((state->jitter < 0) && (state->lastsample > state->center) && (state->rf_mod != 1))
+                if ((state->jitter < 0) && (state->lastsample > state->center) && (state->rf_mod != 1))
                 {               // first transition edge
-                  state->jitter = i;
+                    state->jitter = i;
                 }
             }
         }
-      if (state->samplesPerSymbol == 20)
+        if (state->samplesPerSymbol == 20)
         {
-          if ((i >= 9) && (i <= 11))
+            if ((i >= 9) && (i <= 11))
             {
-              sum += sample;
-              count++;
+                sum += sample;
+                count++;
             }
         }
-      if (state->samplesPerSymbol == 5)
+        if (state->samplesPerSymbol == 5)
         {
-          if (i == 2)
+            if (i == 2)
             {
-              sum += sample;
-              count++;
+                sum += sample;
+                count++;
             }
         }
-      else
+        else
         {
-          if (state->rf_mod == 0)
+            if (state->rf_mod == 0)
             {
-              // 0: C4FM modulation
+                // 0: C4FM modulation
 
-              if ((i >= state->symbolCenter - 1) && (i <= state->symbolCenter + 2))
+                if ((i >= state->symbolCenter - 1) && (i <= state->symbolCenter + 2))
                 {
-                  sum += sample;
-                  count++;
+                    sum += sample;
+                    count++;
                 }
 
 #ifdef TRACE_DSD
-              if (i == state->symbolCenter - 1) {
+                if (i == state->symbolCenter - 1) {
                   state->debug_sample_left_edge = state->debug_sample_index - 1;
               }
               if (i == state->symbolCenter + 2) {
@@ -236,24 +236,24 @@ getSymbol (dsd_opts * opts, dsd_state * state, int have_sync)
               }
 #endif
             }
-          else
+            else
             {
-              // 1: QPSK modulation
-              // 2: GFSK modulation
-              // Note: this has been changed to use an additional symbol to the left
-              // On the p25_raw_unencrypted.flac it is evident that the timing
-              // comes one sample too late.
-              // This change makes a significant improvement in the BER, at least for
-              // this file.
-              //if ((i == state->symbolCenter) || (i == state->symbolCenter + 1))
-              if ((i == state->symbolCenter - 1) || (i == state->symbolCenter + 1))
+                // 1: QPSK modulation
+                // 2: GFSK modulation
+                // Note: this has been changed to use an additional symbol to the left
+                // On the p25_raw_unencrypted.flac it is evident that the timing
+                // comes one sample too late.
+                // This change makes a significant improvement in the BER, at least for
+                // this file.
+                //if ((i == state->symbolCenter) || (i == state->symbolCenter + 1))
+                if ((i == state->symbolCenter - 1) || (i == state->symbolCenter + 1))
                 {
-                  sum += sample;
-                  count++;
+                    sum += sample;
+                    count++;
                 }
 
 #ifdef TRACE_DSD
-              //if (i == state->symbolCenter) {
+                //if (i == state->symbolCenter) {
               if (i == state->symbolCenter - 1) {
                   state->debug_sample_left_edge = state->debug_sample_index - 1;
               }
@@ -265,25 +265,25 @@ getSymbol (dsd_opts * opts, dsd_state * state, int have_sync)
         }
 
 
-      state->lastsample = sample;
+        state->lastsample = sample;
     }   // for
 
-  symbol = (sum / count);
+    symbol = (sum / count);
 
-  if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
+    if ((opts->symboltiming == 1) && (have_sync == 0) && (state->lastsynctype != -1))
     {
-      if (state->jitter >= 0)
+        if (state->jitter >= 0)
         {
-         fprintf(stderr, " %i\n", state->jitter);
+            fprintf(stderr, " %i\n", state->jitter);
         }
-      else
+        else
         {
-         fprintf(stderr, "\n");
+            fprintf(stderr, "\n");
         }
     }
 
 #ifdef TRACE_DSD
-  if (state->samplesPerSymbol == 10) {
+    if (state->samplesPerSymbol == 10) {
       float left, right;
       if (state->debug_label_file == NULL) {
           state->debug_label_file = fopen ("pp_label.txt", "w");
@@ -303,6 +303,6 @@ getSymbol (dsd_opts * opts, dsd_state * state, int have_sync)
 #endif
 
 
-  state->symbolcnt++;
-  return (symbol);
+    state->symbolcnt++;
+    return (symbol);
 }

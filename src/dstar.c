@@ -17,7 +17,7 @@
 
 /*
  * Note: D-STAR support is fairly complete at this point.
- * The ambe3600x2450 decoder is similar butnot compatible with D-STAR voice frames. 
+ * The ambe3600x2450 decoder is similar butnot compatible with D-STAR voice frames.
  * The dstar interleave pattern is different as well.
  * GMSK modulation optimizations will also required to get a usable bit error
  */
@@ -28,136 +28,136 @@
 
 
 void processDSTAR(dsd_opts * opts, dsd_state * state) {
-	// extracts AMBE frames from D-STAR voice frame
-	int i, j, dibit;
-	char ambe_fr[4][24];
-	unsigned char data[9];
-	unsigned int bits[4];
-	int framecount;
-	int sync_missed = 0;
-	unsigned char slowdata[4];
-	unsigned int bitbuffer = 0;
-	const int *w, *x;
+    // extracts AMBE frames from D-STAR voice frame
+    int i, j, dibit;
+    char ambe_fr[4][24];
+    unsigned char data[9];
+    unsigned int bits[4];
+    int framecount;
+    int sync_missed = 0;
+    unsigned char slowdata[4];
+    unsigned int bitbuffer = 0;
+    const int *w, *x;
 
-	if (opts->errorbars == 1) {
-	fprintf(stderr, "e:");
-	}
+    if (opts->errorbars == 1) {
+        fprintf(stderr, "e:");
+    }
 
 #ifdef DSTAR_DUMP
-fprintf(stderr, "\n");
+    fprintf(stderr, "\n");
 #endif
 
-	if (state->synctype == 18) {
-		framecount = 0;
-		state->synctype = 6;
-	} else if (state->synctype == 19) {
-		framecount = 0;
-		state->synctype = 7;
-	} else {
-		framecount = 1; //just saw a sync frame; there should be 20 not 21 till the next
-	}
+    if (state->synctype == 18) {
+        framecount = 0;
+        state->synctype = 6;
+    } else if (state->synctype == 19) {
+        framecount = 0;
+        state->synctype = 7;
+    } else {
+        framecount = 1; //just saw a sync frame; there should be 20 not 21 till the next
+    }
 
-	while (sync_missed < 3) {
+    while (sync_missed < 3) {
 
-		memset(ambe_fr, 0, 96);
-		// voice frame
-	    w = dW;
-	    x = dX;
+        memset(ambe_fr, 0, 96);
+        // voice frame
+        w = dW;
+        x = dX;
 
-		for (i = 0; i < 72; i++) {
+        for (i = 0; i < 72; i++) {
 
-			dibit = getDibit(opts, state);
+            dibit = getDibit(opts, state);
 
-			bitbuffer <<= 1;
-			if (dibit == 1) {
-				bitbuffer |= 0x01;
-			}
-			if ((bitbuffer & 0x00FFFFFF) == 0x00AAB468) {
-				// we're slipping bits
-			fprintf(stderr, "sync in voice after i=%d, restarting\n", i);
-				//ugh just start over
-				i = 0;
-			    w = dW;
-			    x = dX;
-				framecount = 1;
-				continue;
-			}
+            bitbuffer <<= 1;
+            if (dibit == 1) {
+                bitbuffer |= 0x01;
+            }
+            if ((bitbuffer & 0x00FFFFFF) == 0x00AAB468) {
+                // we're slipping bits
+                fprintf(stderr, "sync in voice after i=%d, restarting\n", i);
+                //ugh just start over
+                i = 0;
+                w = dW;
+                x = dX;
+                framecount = 1;
+                continue;
+            }
 
-			ambe_fr[*w][*x] = (1 & dibit);
-			w++;
-			x++;
-		}
+            ambe_fr[*w][*x] = (1 & dibit);
+            w++;
+            x++;
+        }
 
 
-		processMbeFrame(opts, state, NULL, ambe_fr, NULL);
+        processMbeFrame(opts, state, NULL, ambe_fr, NULL);
 
-		//  data frame - 24 bits
-		for (i = 73; i < 97; i++) {
-			dibit = getDibit(opts, state);
-			bitbuffer <<= 1;
-			if (dibit == 1) {
-				bitbuffer |= 0x01;
-			}
-			if ((bitbuffer & 0x00FFFFFF) == 0x00AAB468) {
-				// looking if we're slipping bits
-				if (i != 96) {
-				fprintf(stderr, "sync after i=%d\n", i);
-					i = 96;
-				}
-			}
-		}
+        //  data frame - 24 bits
+        for (i = 73; i < 97; i++) {
+            dibit = getDibit(opts, state);
+            bitbuffer <<= 1;
+            if (dibit == 1) {
+                bitbuffer |= 0x01;
+            }
+            if ((bitbuffer & 0x00FFFFFF) == 0x00AAB468) {
+                // looking if we're slipping bits
+                if (i != 96) {
+                    fprintf(stderr, "sync after i=%d\n", i);
+                    i = 96;
+                }
+            }
+        }
 
-		slowdata[0] = (bitbuffer >> 16) & 0x000000FF;
-		slowdata[1] = (bitbuffer >> 8) & 0x000000FF;
-		slowdata[2] = (bitbuffer) & 0x000000FF;
-		slowdata[3] = 0;
+        slowdata[0] = (bitbuffer >> 16) & 0x000000FF;
+        slowdata[1] = (bitbuffer >> 8) & 0x000000FF;
+        slowdata[2] = (bitbuffer) & 0x000000FF;
+        slowdata[3] = 0;
 
-		if ((bitbuffer & 0x00FFFFFF) == 0x00AAB468) {
-			//We got sync!
-			//fprintf(stderr, "Sync on framecount = %d\n", framecount);
-			sync_missed = 0;
-		} else if ((bitbuffer & 0x00FFFFFF) == 0xAAAAAA) {
-			//End of transmission
-		fprintf(stderr, "End of transmission\n");
-			goto end;
-		} else if (framecount % 21 == 0) {
-		fprintf(stderr, "Missed sync on framecount = %d, value = %x/%x/%x\n",
-					framecount, slowdata[0], slowdata[1], slowdata[2]);
-			sync_missed++;
-		} else if (framecount != 0 && (bitbuffer & 0x00FFFFFF) != 0x000000) {
-			slowdata[0] ^= 0x70;
-			slowdata[1] ^= 0x4f;
-			slowdata[2] ^= 0x93;
-			//fprintf(stderr, "unscrambled- %s",slowdata);
+        if ((bitbuffer & 0x00FFFFFF) == 0x00AAB468) {
+            //We got sync!
+            //fprintf(stderr, "Sync on framecount = %d\n", framecount);
+            sync_missed = 0;
+        } else if ((bitbuffer & 0x00FFFFFF) == 0xAAAAAA) {
+            //End of transmission
+            fprintf(stderr, "End of transmission\n");
+            goto end;
+        } else if (framecount % 21 == 0) {
+            fprintf(stderr, "Missed sync on framecount = %d, value = %x/%x/%x\n",
+                    framecount, slowdata[0], slowdata[1], slowdata[2]);
+            sync_missed++;
+        } else if (framecount != 0 && (bitbuffer & 0x00FFFFFF) != 0x000000) {
+            slowdata[0] ^= 0x70;
+            slowdata[1] ^= 0x4f;
+            slowdata[2] ^= 0x93;
+            //fprintf(stderr, "unscrambled- %s",slowdata);
 
-		} else if (framecount == 0) {
-			//fprintf(stderr, "never scrambled-%s\n",slowdata);
-		}
+        } else if (framecount == 0) {
+            //fprintf(stderr, "never scrambled-%s\n",slowdata);
+        }
 
-		framecount++;
-	}
+        framecount++;
+    }
 
-	end: if (opts->errorbars == 1) {
-	fprintf(stderr, "\n");
-	}
+    end: if (opts->errorbars == 1) {
+    fprintf(stderr, "\n");
+}
 }
 
 void processDSTAR_HD(dsd_opts * opts, dsd_state * state) {
 
-	int i, j;
-	int radioheaderbuffer[660];
+    int i, j;
+    int radioheaderbuffer[660];
 
-	for (j = 0; j < 660; j++) {
-					radioheaderbuffer[j] = getDibit(opts, state);
-			}
+    for (j = 0; j < 660; j++) {
+        radioheaderbuffer[j] = getDibit(opts, state);
+    }
 
-	// Note: These routines contain GPLed code. Remove if you object to that.
-	// Due to this, they are in a separate source file.
-	dstar_header_decode(radioheaderbuffer);
+    // Note: These routines contain GPLed code. Remove if you object to that.
+    // Due to this, they are in a separate source file.
+    dstar_header_decode(radioheaderbuffer);
 
-	//We officially have sync now, so just pass on to the above routine:
+    //We officially have sync now, so just pass on to the above routine:
 
-	processDSTAR(opts, state);
+    processDSTAR(opts, state);
 
 }
 

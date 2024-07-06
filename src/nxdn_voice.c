@@ -4,56 +4,56 @@
 void
 processNXDNVoice (dsd_opts * opts, dsd_state * state)
 {
-  int i, j, dibit;
-  char ambe_fr[4][24];
-  const int *w, *x, *y, *z;
-  const char *pr;
+    int i, j, dibit;
+    char ambe_fr[4][24];
+    const int *w, *x, *y, *z;
+    const char *pr;
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-     fprintf(stderr, "VOICE e:");
+        fprintf(stderr, "VOICE e:");
     }
 
-  for (i = 0; i < 30; i++)
+    for (i = 0; i < 30; i++)
     {
-      dibit = getDibit (opts, state);
+        dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-     fprintf(stderr, "%c", dibit + 48);
+        fprintf(stderr, "%c", dibit + 48);
 #endif
     }
 #ifdef NXDN_DUMP
- fprintf(stderr, " ");
+    fprintf(stderr, " ");
 #endif
 
-  pr = nxdnpr;
-  for (j = 0; j < 4; j++)
+    pr = nxdnpr;
+    for (j = 0; j < 4; j++)
     {
-      w = nW;
-      x = nX;
-      y = nY;
-      z = nZ;
-      for (i = 0; i < 36; i++)
+        w = nW;
+        x = nX;
+        y = nY;
+        z = nZ;
+        for (i = 0; i < 36; i++)
         {
-          dibit = getDibit (opts, state);
+            dibit = getDibit (opts, state);
 #ifdef NXDN_DUMP
-         fprintf(stderr, "%c", dibit + 48);
+            fprintf(stderr, "%c", dibit + 48);
 #endif
-          ambe_fr[*w][*x] = *pr ^ (1 & (dibit >> 1));   // bit 1
-          pr++;
-          ambe_fr[*y][*z] = (1 & dibit);        // bit 0
-          w++;
-          x++;
-          y++;
-          z++;
+            ambe_fr[*w][*x] = *pr ^ (1 & (dibit >> 1));   // bit 1
+            pr++;
+            ambe_fr[*y][*z] = (1 & dibit);        // bit 0
+            w++;
+            x++;
+            y++;
+            z++;
         }
-      processMbeFrame (opts, state, NULL, ambe_fr, NULL);
+        processMbeFrame (opts, state, NULL, ambe_fr, NULL);
 #ifdef NXDN_DUMP
-     fprintf(stderr, " ");
+        fprintf(stderr, " ");
 #endif
     }
 
-  if (opts->errorbars == 1)
+    if (opts->errorbars == 1)
     {
-     fprintf(stderr, "\n");
+        fprintf(stderr, "\n");
     }
 }
