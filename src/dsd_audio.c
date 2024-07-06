@@ -175,7 +175,8 @@ void writeSynthesizedVoice(dsd_opts *opts, dsd_state *state) {
     }
 
     sf_write_short(opts->wav_out_f, aout_buf, 160);
-    sf_write_sync(opts->wav_out_f);
+    if (opts->isFlushFile)
+        sf_write_sync(opts->wav_out_f);
 }
 
 

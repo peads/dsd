@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 project(dsd)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
@@ -57,7 +57,7 @@ if (HELP2MAN_FOUND)
             --version-string=${GIT_TAG}
             -o ${CMAKE_CURRENT_BINARY_DIR}/dsd.1
             --no-info
-            $<TARGET_FILE:dsd> 
+            $<TARGET_FILE:dsd>
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dsd.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()

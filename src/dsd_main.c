@@ -142,6 +142,7 @@ initOpts (dsd_opts * opts)
     opts->delay = 0;
     opts->use_cosine_filter = 1;
     opts->unmute_encrypted_p25 = 0;
+    opts->isFlushFile = 0;
 }
 
 void
@@ -471,7 +472,7 @@ main (int argc, char **argv)
     exitflag = 0;
     signal (SIGINT, sigfun);
 
-    while ((c = getopt (argc, argv, "haep:qstv:z:i:o:d:g:nw:B:C:R:f:m:u:x:A:S:M:rl")) != -1)
+    while ((c = getopt (argc, argv, "haep:qstv:z:i:o:d:g:nw:B:C:R:f:m:u:x:A:S:M:rlF")) != -1)
     {
         opterr = 0;
         switch (c)
@@ -794,6 +795,9 @@ main (int argc, char **argv)
                 break;
             case 'l':
                 opts.use_cosine_filter = 0;
+                break;
+            case 'F':
+                opts.isFlushFile = 1;
                 break;
             default:
                 usage ();
