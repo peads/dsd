@@ -104,7 +104,7 @@ typedef struct
   int audio_out;
   char wav_out_file[1024];
   SNDFILE *wav_out_f;
-  //int wav_out_fd;
+  int wav_out_major_type;
   int serial_baud;
   char serial_dev[1024];
   int serial_fd;
@@ -281,7 +281,7 @@ int readAmbe2450Data (dsd_opts * opts, dsd_state * state, char *ambe_d);
 void openMbeInFile (dsd_opts * opts, dsd_state * state);
 void closeMbeOutFile (dsd_opts * opts, dsd_state * state);
 void openMbeOutFile (dsd_opts * opts, dsd_state * state);
-void openWavOutFile (dsd_opts * opts, dsd_state * state);
+void openWavOutFile (dsd_opts * opts, __attribute__((unused)) dsd_state * state);
 void closeWavOutFile (dsd_opts * opts, dsd_state * state);
 void printFrameInfo (dsd_opts * opts, dsd_state * state);
 void processFrame (dsd_opts * opts, dsd_state * state);
