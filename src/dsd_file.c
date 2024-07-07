@@ -316,14 +316,16 @@ openMbeOutFile (dsd_opts * opts, dsd_state * state)
     fflush (opts->mbe_out_f);
 }
 
-void openWavOutFile (dsd_opts *opts, dsd_state *state) {
+void openWavOutFile(dsd_opts *opts, __attribute__((unused)) dsd_state *state) {
+
     SF_INFO info;
     info.samplerate = 8000;
     info.channels = 1;
-    info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 | SF_ENDIAN_LITTLE;
+    info.format = opts->wav_out_major_type | SF_FORMAT_PCM_16 | SF_ENDIAN_LITTLE;
     opts->wav_out_f = sf_open(opts->wav_out_file, SFM_WRITE, &info);
 
     if (!opts->wav_out_f) {
+        perror(NULL);
         fprintf(stderr, "Error - could not open wav output file %s\n", opts->wav_out_file);
         return;
     }

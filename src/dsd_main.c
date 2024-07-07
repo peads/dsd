@@ -118,7 +118,7 @@ initOpts (dsd_opts * opts)
     opts->audio_out = 1;
     opts->wav_out_file[0] = 0;
     opts->wav_out_f = NULL;
-    //opts->wav_out_fd = -1;
+    opts->wav_out_major_type = SF_FORMAT_WAV;
     opts->serial_baud = 115200;
     sprintf (opts->serial_dev, "/dev/ttyUSB0");
     opts->resume = 0;
@@ -276,7 +276,7 @@ usage ()
     fprintf(stderr, "  -r <files>    Read/Play saved mbe data from file(s)\n");
     fprintf(stderr, "  -g <num>      Audio output gain (default = 0 = auto, disable = -1)\n");
     fprintf(stderr, "  -n            Do not send synthesized speech to audio output device\n");
-    fprintf(stderr, "  -w <file>     Output synthesized speech to a .wav file\n");
+    fprintf(stderr, "  -w - | <file> Output synthesized speech to a .wav file, or pipe raw PCM to stdout; both are mono, 8kHz, 16-bit, signed-int\n");
     fprintf(stderr, "  -a            Display port audio devices\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Scanner control options:\n");
@@ -576,10 +576,17 @@ main (int argc, char **argv)
                 fprintf(stderr, "Disabling audio output to soundcard.\n");
                 break;
             case 'w':
+                // TODO consider: should piping to stdout imply '-q' as well?
+                if (!strcmp("-", optarg)) {
+                    checkFileError(freopen(NULL, "wb", stdout));
+                    opts.audio_out = 0;
+                    opts.wav_out_major_type = SF_FORMAT_RAW;
+//                    opts.errorbars = 0;
+//                    opts.verbose = 0;
+                }
                 strncpy(opts.wav_out_file, optarg, 1023);
                 opts.wav_out_file[1023] = '\0';
                 fprintf(stderr, "Writing audio to file %s\n", opts.wav_out_file);
-                openWavOutFile (&opts, &state);
                 break;
             case 'B':
                 sscanf (optarg, "%d", &opts.serial_baud);
