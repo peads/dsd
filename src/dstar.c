@@ -29,10 +29,8 @@
 
 void processDSTAR(dsd_opts * opts, dsd_state * state) {
     // extracts AMBE frames from D-STAR voice frame
-    int i, j, dibit;
+    int i, dibit;
     char ambe_fr[4][24];
-    unsigned char data[9];
-    unsigned int bits[4];
     int framecount;
     int sync_missed = 0;
     unsigned char slowdata[4];
@@ -83,7 +81,7 @@ void processDSTAR(dsd_opts * opts, dsd_state * state) {
                 continue;
             }
 
-            ambe_fr[*w][*x] = (1 & dibit);
+            ambe_fr[*w][*x] = (char) (1 & dibit);
             w++;
             x++;
         }
@@ -119,7 +117,7 @@ void processDSTAR(dsd_opts * opts, dsd_state * state) {
         } else if ((bitbuffer & 0x00FFFFFF) == 0xAAAAAA) {
             //End of transmission
             fprintf(stderr, "End of transmission\n");
-            goto end;
+            break;
         } else if (framecount % 21 == 0) {
             fprintf(stderr, "Missed sync on framecount = %d, value = %x/%x/%x\n",
                     framecount, slowdata[0], slowdata[1], slowdata[2]);
@@ -137,14 +135,14 @@ void processDSTAR(dsd_opts * opts, dsd_state * state) {
         framecount++;
     }
 
-    end: if (opts->errorbars == 1) {
-    fprintf(stderr, "\n");
-}
+    if (opts->errorbars == 1) {
+        fprintf(stderr, "\n");
+    }
 }
 
 void processDSTAR_HD(dsd_opts * opts, dsd_state * state) {
 
-    int i, j;
+    int j;
     int radioheaderbuffer[660];
 
     for (j = 0; j < 660; j++) {

@@ -17,6 +17,7 @@
 
 #define _MAIN
 
+#include <string.h>
 #include "dsd.h"
 #include "p25p1_const.h"
 #include "x2tdma_const.h"
@@ -30,25 +31,23 @@
 
 int exitflag = 0;
 
-int
-comp (const void *a, const void *b)
-{
-    if (*((const int *) a) == *((const int *) b))
+int comp(const void *a, const void *b) {
+
+    if (*((const int *) a) == *((const int *) b)) {
         return 0;
-    else if (*((const int *) a) < *((const int *) b))
+    } else if (*((const int *) a) < *((const int *) b)) {
         return -1;
-    else
+    } else {
         return 1;
+    }
 }
 
-void
-noCarrier (dsd_opts * opts, dsd_state * state)
-{
+void noCarrier(dsd_opts *opts, dsd_state *state) {
+
     state->dibit_buf_p = state->dibit_buf + 200;
-    memset (state->dibit_buf, 0, sizeof (int) * 200);
-    if (opts->mbe_out_f != NULL)
-    {
-        closeMbeOutFile (opts, state);
+    memset(state->dibit_buf, 0, sizeof(int) * 200);
+    if (opts->mbe_out_f != NULL) {
+        closeMbeOutFile(opts, state);
     }
     state->jitter = -1;
     state->lastsynctype = -1;
@@ -57,8 +56,8 @@ noCarrier (dsd_opts * opts, dsd_state * state)
     state->min = -15000;
     state->center = 0;
     state->err_str[0] = 0;
-    sprintf (state->fsubtype, "              ");
-    sprintf (state->ftype, "             ");
+    sprintf(state->fsubtype, "              ");
+    sprintf(state->ftype, "             ");
     state->errs = 0;
     state->errs2 = 0;
     state->lasttg = 0;
@@ -67,24 +66,21 @@ noCarrier (dsd_opts * opts, dsd_state * state)
     state->repeat = 0;
     state->nac = 0;
     state->numtdulc = 0;
-    sprintf (state->slot0light, " slot0 ");
-    sprintf (state->slot1light, " slot1 ");
+    sprintf(state->slot0light, " slot0 ");
+    sprintf(state->slot1light, " slot1 ");
     state->firstframe = 0;
-    if (opts->audio_gain == (float) 0)
-    {
+    if (!opts->audio_gain) {
         state->aout_gain = 25;
     }
-    memset (state->aout_max_buf, 0, sizeof (float) * 200);
+    memset(state->aout_max_buf, 0, sizeof(float) * 200);
     state->aout_max_buf_p = state->aout_max_buf;
     state->aout_max_buf_idx = 0;
-    sprintf (state->algid, "________");
-    sprintf (state->keyid, "________________");
-    mbe_initMbeParms (state->cur_mp, state->prev_mp, state->prev_mp_enhanced);
+    sprintf(state->algid, "________");
+    sprintf(state->keyid, "________________");
+    mbe_initMbeParms(state->cur_mp, state->prev_mp, state->prev_mp_enhanced);
 }
 
-void
-initOpts (dsd_opts * opts)
-{
+void initOpts(dsd_opts *opts) {
 
     opts->onesymbol = 10;
     opts->mbe_in_file[0] = 0;
@@ -98,12 +94,12 @@ initOpts (dsd_opts * opts)
     opts->p25status = 0;
     opts->p25tg = 0;
     opts->scoperate = 15;
-    sprintf (opts->audio_in_dev, "/dev/audio");
+    sprintf(opts->audio_in_dev, "/dev/audio");
     opts->audio_in_fd = -1;
 #ifdef USE_PORTAUDIO
     opts->audio_in_pa_stream = NULL;
 #endif
-    sprintf (opts->audio_out_dev, "/dev/audio");
+    sprintf(opts->audio_out_dev, "/dev/audio");
     opts->audio_out_fd = -1;
 #ifdef USE_PORTAUDIO
     opts->audio_out_pa_stream = NULL;
@@ -120,7 +116,7 @@ initOpts (dsd_opts * opts)
     opts->wav_out_f = NULL;
     opts->wav_out_major_type = SF_FORMAT_WAV;
     opts->serial_baud = 115200;
-    sprintf (opts->serial_dev, "/dev/ttyUSB0");
+    sprintf(opts->serial_dev, "/dev/ttyUSB0");
     opts->resume = 0;
     opts->frame_dstar = 0;
     opts->frame_x2tdma = 1;
@@ -142,24 +138,21 @@ initOpts (dsd_opts * opts)
     opts->delay = 0;
     opts->use_cosine_filter = 1;
     opts->unmute_encrypted_p25 = 0;
-    opts->isFlushFile = 0;
 }
 
-void
-initState (dsd_state * state)
-{
+void initState(dsd_state *state) {
 
     int i, j;
 
-    state->dibit_buf = malloc (sizeof (int) * 1000000);
+    state->dibit_buf = malloc(sizeof(int) * 1000000);
     state->dibit_buf_p = state->dibit_buf + 200;
-    memset (state->dibit_buf, 0, sizeof (int) * 200);
+    memset(state->dibit_buf, 0, sizeof(int) * 200);
     state->repeat = 0;
-    state->audio_out_buf = malloc (sizeof (short) * 1000000);
-    memset (state->audio_out_buf, 0, 100 * sizeof (short));
+    state->audio_out_buf = malloc(sizeof(short) * 1000000);
+    memset(state->audio_out_buf, 0, 100 * sizeof(short));
     state->audio_out_buf_p = state->audio_out_buf + 100;
-    state->audio_out_float_buf = malloc (sizeof (float) * 1000000);
-    memset (state->audio_out_float_buf, 0, 100 * sizeof (float));
+    state->audio_out_float_buf = malloc(sizeof(float) * 1000000);
+    memset(state->audio_out_float_buf, 0, 100 * sizeof(float));
     state->audio_out_float_buf_p = state->audio_out_float_buf + 100;
     state->audio_out_idx = 0;
     state->audio_out_idx2 = 0;
@@ -175,23 +168,20 @@ initState (dsd_state * state)
     state->minref = -12000;
     state->maxref = 12000;
     state->lastsample = 0;
-    for (i = 0; i < 128; i++)
-    {
+    for (i = 0; i < 128; i++) {
         state->sbuf[i] = 0;
     }
     state->sidx = 0;
-    for (i = 0; i < 1024; i++)
-    {
+    for (i = 0; i < 1024; i++) {
         state->maxbuf[i] = 15000;
     }
-    for (i = 0; i < 1024; i++)
-    {
+    for (i = 0; i < 1024; i++) {
         state->minbuf[i] = -15000;
     }
     state->midx = 0;
     state->err_str[0] = 0;
-    sprintf (state->fsubtype, "              ");
-    sprintf (state->ftype, "             ");
+    sprintf(state->fsubtype, "              ");
+    sprintf(state->ftype, "             ");
     state->symbolcnt = 0;
     state->rf_mod = 0;
     state->numflips = 0;
@@ -199,10 +189,8 @@ initState (dsd_state * state)
     state->lastp25type = 0;
     state->offset = 0;
     state->carrier = 0;
-    for (i = 0; i < 25; i++)
-    {
-        for (j = 0; j < 16; j++)
-        {
+    for (i = 0; i < 25; i++) {
+        for (j = 0; j < 16; j++) {
             state->tg[i][j] = 48;
         }
     }
@@ -216,21 +204,21 @@ initState (dsd_state * state)
     state->optind = 0;
     state->numtdulc = 0;
     state->firstframe = 0;
-    sprintf (state->slot0light, " slot0 ");
-    sprintf (state->slot1light, " slot1 ");
+    sprintf(state->slot0light, " slot0 ");
+    sprintf(state->slot1light, " slot1 ");
     state->aout_gain = 25;
-    memset (state->aout_max_buf, 0, sizeof (float) * 200);
+    memset(state->aout_max_buf, 0, sizeof(float) * 200);
     state->aout_max_buf_p = state->aout_max_buf;
     state->aout_max_buf_idx = 0;
     state->samplesPerSymbol = 10;
     state->symbolCenter = 4;
-    sprintf (state->algid, "________");
-    sprintf (state->keyid, "________________");
+    sprintf(state->algid, "________");
+    sprintf(state->keyid, "________________");
     state->currentslot = 0;
-    state->cur_mp = malloc (sizeof (mbe_parms));
-    state->prev_mp = malloc (sizeof (mbe_parms));
-    state->prev_mp_enhanced = malloc (sizeof (mbe_parms));
-    mbe_initMbeParms (state->cur_mp, state->prev_mp, state->prev_mp_enhanced);
+    state->cur_mp = malloc(sizeof(mbe_parms));
+    state->prev_mp = malloc(sizeof(mbe_parms));
+    state->prev_mp_enhanced = malloc(sizeof(mbe_parms));
+    mbe_initMbeParms(state->cur_mp, state->prev_mp, state->prev_mp_enhanced);
     state->p25kid = 0;
 
     state->debug_audio_errors = 0;
@@ -249,9 +237,8 @@ initState (dsd_state * state)
     initialize_p25_heuristics(&state->p25_heuristics);
 }
 
-void
-usage ()
-{
+void usage() {
+
     fprintf(stderr, "\n");
     fprintf(stderr, "Usage: dsd [options]            Live scanner mode\n");
     fprintf(stderr, "  or:  dsd [options] -r <files> Read/Play saved mbe data from file(s)\n");
@@ -270,13 +257,15 @@ usage ()
     fprintf(stderr, "  -z <num>      Frame rate for datascope\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Input/Output options:\n");
-    fprintf(stderr, "  -i <device>   Audio input device (default is /dev/audio, - for piped stdin)\n");
+    fprintf(stderr,
+            "  -i <device>   Audio input device (default is /dev/audio, - for piped stdin)\n");
     fprintf(stderr, "  -o <device>   Audio output device (default is /dev/audio)\n");
     fprintf(stderr, "  -d <dir>      Create mbe data files, use this directory\n");
     fprintf(stderr, "  -r <files>    Read/Play saved mbe data from file(s)\n");
     fprintf(stderr, "  -g <num>      Audio output gain (default = 0 = auto, disable = -1)\n");
     fprintf(stderr, "  -n            Do not send synthesized speech to audio output device\n");
-    fprintf(stderr, "  -w - | <file> Output synthesized speech to a .wav file, or pipe raw PCM to stdout; both are mono, 8kHz, 16-bit, signed-int\n");
+    fprintf(stderr,
+            "  -w - | <file> Output synthesized speech to a .wav file, or pipe raw PCM to stdout; both are mono, 8kHz, 16-bit, signed-int\n");
     fprintf(stderr, "  -a            Display port audio devices\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Scanner control options:\n");
@@ -313,42 +302,37 @@ usage ()
     fprintf(stderr, "                 (default=15)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Report bugs to: https://github.com/szechyjs/dsd/issues\n");
-    exit (0);
+    exit(0);
 }
 
-void
-liveScanner (dsd_opts * opts, dsd_state * state)
-{
+void liveScanner(dsd_opts *opts, dsd_state *state) {
+
 #ifdef USE_PORTAUDIO
-    if(opts->audio_in_type == 2)
-    {
-        PaError err = Pa_StartStream( opts->audio_in_pa_stream );
-        if( err != paNoError )
-        {
-            fprintf( stderr, "An error occured while starting the portaudio input stream\n" );
-            fprintf( stderr, "Error number: %d\n", err );
-            fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+    if (opts->audio_in_type == 2) {
+        PaError err = Pa_StartStream(opts->audio_in_pa_stream);
+        if (err != paNoError) {
+            fprintf(stderr, "An error occured while starting the portaudio input stream\n");
+            fprintf(stderr, "Error number: %d\n", err);
+            fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
             return;
         }
     }
 #endif
-    while (1)
-    {
-        noCarrier (opts, state);
-        state->synctype = getFrameSync (opts, state);
+    while (1) {
+        noCarrier(opts, state);
+        state->synctype = getFrameSync(opts, state);
         // recalibrate center/umid/lmid
         state->center = ((state->max) + (state->min)) / 2;
         state->umid = (((state->max) - state->center) * 5 / 8) + state->center;
         state->lmid = (((state->min) - state->center) * 5 / 8) + state->center;
-        while (state->synctype != -1)
-        {
-            processFrame (opts, state);
+        while (state->synctype != -1) {
+            processFrame(opts, state);
 
 #ifdef TRACE_DSD
             state->debug_prefix = 'S';
 #endif
 
-            state->synctype = getFrameSync (opts, state);
+            state->synctype = getFrameSync(opts, state);
 
 #ifdef TRACE_DSD
             state->debug_prefix = '\0';
@@ -362,54 +346,47 @@ liveScanner (dsd_opts * opts, dsd_state * state)
     }
 }
 
-void
-cleanupAndExit (dsd_opts * opts, dsd_state * state)
-{
-    noCarrier (opts, state);
+void cleanupAndExit(dsd_opts *opts, dsd_state *state) {
+
+    noCarrier(opts, state);
     if (opts->wav_out_f) {
         sf_close(opts->wav_out_f);
     }
 
 #ifdef USE_PORTAUDIO
-    if((opts->audio_in_type == 2) || (opts->audio_out_type == 2))
-    {
+    if ((opts->audio_in_type == 2) || (opts->audio_out_type == 2)) {
         fprintf(stderr, "Terminating portaudio.\n");
-        PaError err = paNoError;
-        if(opts->audio_in_pa_stream != NULL)
-        {
-            err = Pa_CloseStream( opts->audio_in_pa_stream );
-            if( err != paNoError )
-            {
-                fprintf( stderr, "An error occured while closing the portaudio input stream\n" );
-                fprintf( stderr, "Error number: %d\n", err );
-                fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+        PaError err;
+        if (opts->audio_in_pa_stream != NULL) {
+            err = Pa_CloseStream(opts->audio_in_pa_stream);
+            if (err != paNoError) {
+                fprintf(stderr, "An error occured while closing the portaudio input stream\n");
+                fprintf(stderr, "Error number: %d\n", err);
+                fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
             }
         }
-        if(opts->audio_out_pa_stream != NULL)
-        {
-            err = Pa_IsStreamActive( opts->audio_out_pa_stream );
-            if(err == 1)
-                err = Pa_StopStream( opts->audio_out_pa_stream );
-            if( err != paNoError )
-            {
-                fprintf( stderr, "An error occured while closing the portaudio output stream\n" );
-                fprintf( stderr, "Error number: %d\n", err );
-                fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+        if (opts->audio_out_pa_stream != NULL) {
+            err = Pa_IsStreamActive(opts->audio_out_pa_stream);
+            if (err == 1) {
+                err = Pa_StopStream(opts->audio_out_pa_stream);
             }
-            err = Pa_CloseStream( opts->audio_out_pa_stream );
-            if( err != paNoError )
-            {
-                fprintf( stderr, "An error occured while closing the portaudio output stream\n" );
-                fprintf( stderr, "Error number: %d\n", err );
-                fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+            if (err != paNoError) {
+                fprintf(stderr, "An error occured while closing the portaudio output stream\n");
+                fprintf(stderr, "Error number: %d\n", err);
+                fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+            }
+            err = Pa_CloseStream(opts->audio_out_pa_stream);
+            if (err != paNoError) {
+                fprintf(stderr, "An error occured while closing the portaudio output stream\n");
+                fprintf(stderr, "Error number: %d\n", err);
+                fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
             }
         }
         err = Pa_Terminate();
-        if( err != paNoError )
-        {
-            fprintf( stderr, "An error occured while terminating portaudio\n" );
-            fprintf( stderr, "Error number: %d\n", err );
-            fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+        if (err != paNoError) {
+            fprintf(stderr, "An error occured while terminating portaudio\n");
+            fprintf(stderr, "Error number: %d\n", err);
+            fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
         }
     }
 #endif
@@ -423,7 +400,9 @@ cleanupAndExit (dsd_opts * opts, dsd_state * state)
 
     fprintf(stderr, "\n");
     fprintf(stderr, "+P25 BER estimate: %.2f%%\n", get_P25_BER_estimate(&state->p25_heuristics));
-    fprintf(stderr, "-P25 BER estimate: %.2f%%\n", get_P25_BER_estimate(&state->inv_p25_heuristics));
+    fprintf(stderr,
+            "-P25 BER estimate: %.2f%%\n",
+            get_P25_BER_estimate(&state->inv_p25_heuristics));
     fprintf(stderr, "\n");
 
 #ifdef TRACE_DSD
@@ -442,44 +421,40 @@ cleanupAndExit (dsd_opts * opts, dsd_state * state)
 #endif
 
     fprintf(stderr, "Exiting.\n");
-    exit (0);
+    exit(0);
 }
 
-void
-sigfun (int sig)
-{
+void sigfun(int sig) {
+
     exitflag = 1;
-    signal (SIGINT, SIG_DFL);
+    fprintf(stderr, "Resetting signal handler for %s\n", strsignal(sig));
+    signal(SIGINT, SIG_DFL);
 }
 
-int
-main (int argc, char **argv)
-{
+int main(int argc, char **argv) {
+
     int c;
-    extern char *optarg;
-    extern int optind, opterr, optopt;
+
     dsd_opts opts;
     dsd_state state;
     char versionstr[25];
-    mbe_printVersion (versionstr);
+    mbe_printVersion(versionstr);
 
     fprintf(stderr, "Digital Speech Decoder 1.7.0-dev (build:%s)\n", GIT_TAG);
     fprintf(stderr, "mbelib version %s\n", versionstr);
 
-    initOpts (&opts);
-    initState (&state);
+    initOpts(&opts);
+    initState(&state);
 
     exitflag = 0;
-    signal (SIGINT, sigfun);
+    signal(SIGINT, sigfun);
 
-    while ((c = getopt (argc, argv, "haep:qstv:z:i:o:d:g:nw:B:C:R:f:m:u:x:A:S:M:rlF")) != -1)
-    {
+    while ((c = getopt(argc, argv, "haep:qstv:z:i:o:d:g:nw:B:C:R:f:m:u:x:A:S:M:rl")) != -1) {
         opterr = 0;
-        switch (c)
-        {
+        switch (c) {
             case 'h':
-                usage ();
-                exit (0);
+                usage();
+                exit(0);
             case 'a':
                 printPortAudioDevices();
                 exit(0);
@@ -488,24 +463,15 @@ main (int argc, char **argv)
                 opts.datascope = 0;
                 break;
             case 'p':
-                if (optarg[0] == 'e')
-                {
+                if (optarg[0] == 'e') {
                     opts.p25enc = 1;
-                }
-                else if (optarg[0] == 'l')
-                {
+                } else if (optarg[0] == 'l') {
                     opts.p25lc = 1;
-                }
-                else if (optarg[0] == 's')
-                {
+                } else if (optarg[0] == 's') {
                     opts.p25status = 1;
-                }
-                else if (optarg[0] == 't')
-                {
+                } else if (optarg[0] == 't') {
                     opts.p25tg = 1;
-                }
-                else if (optarg[0] == 'u')
-                {
+                } else if (optarg[0] == 'u') {
                     opts.unmute_encrypted_p25 = 1;
                 }
                 break;
@@ -528,10 +494,10 @@ main (int argc, char **argv)
                 opts.datascope = 0;
                 break;
             case 'v':
-                sscanf (optarg, "%d", &opts.verbose);
+                sscanf(optarg, "%d", &opts.verbose);
                 break;
             case 'z':
-                sscanf (optarg, "%d", &opts.scoperate);
+                sscanf(optarg, "%d", &opts.scoperate);
                 opts.errorbars = 0;
                 opts.p25enc = 0;
                 opts.p25lc = 0;
@@ -539,7 +505,9 @@ main (int argc, char **argv)
                 opts.p25tg = 0;
                 opts.datascope = 1;
                 opts.symboltiming = 0;
-                fprintf(stderr, "Setting datascope frame rate to %i frame per second.\n", opts.scoperate);
+                fprintf(stderr,
+                        "Setting datascope frame rate to %i frame per second.\n",
+                        opts.scoperate);
                 break;
             case 'i':
                 strncpy(opts.audio_in_dev, optarg, 1023);
@@ -555,18 +523,13 @@ main (int argc, char **argv)
                 fprintf(stderr, "Writing mbe data files to directory %s\n", opts.mbe_out_dir);
                 break;
             case 'g':
-                sscanf (optarg, "%f", &opts.audio_gain);
-                if (opts.audio_gain < (float) 0 )
-                {
+                sscanf(optarg, "%f", &opts.audio_gain);
+                if (opts.audio_gain < 0.f) {
                     fprintf(stderr, "Disabling audio out gain setting\n");
-                }
-                else if (opts.audio_gain == (float) 0)
-                {
-                    opts.audio_gain = (float) 0;
+                } else if (!opts.audio_gain) {
+                    opts.audio_gain = 0.f;
                     fprintf(stderr, "Enabling audio out auto-gain\n");
-                }
-                else
-                {
+                } else {
                     fprintf(stderr, "Setting audio out gain to %f\n", opts.audio_gain);
                     state.aout_gain = opts.audio_gain;
                 }
@@ -589,19 +552,18 @@ main (int argc, char **argv)
                 fprintf(stderr, "Writing audio to file %s\n", opts.wav_out_file);
                 break;
             case 'B':
-                sscanf (optarg, "%d", &opts.serial_baud);
+                sscanf(optarg, "%d", &opts.serial_baud);
                 break;
             case 'C':
                 strncpy(opts.serial_dev, optarg, 1023);
                 opts.serial_dev[1023] = '\0';
                 break;
             case 'R':
-                sscanf (optarg, "%d", &opts.resume);
+                sscanf(optarg, "%d", &opts.resume);
                 fprintf(stderr, "Enabling scan resume after %i TDULC frames\n", opts.resume);
                 break;
             case 'f':
-                if (optarg[0] == 'a')
-                {
+                if (optarg[0] == 'a') {
                     opts.frame_dstar = 1;
                     opts.frame_x2tdma = 1;
                     opts.frame_p25p1 = 1;
@@ -609,9 +571,7 @@ main (int argc, char **argv)
                     opts.frame_nxdn96 = 1;
                     opts.frame_dmr = 1;
                     opts.frame_provoice = 0;
-                }
-                else if (optarg[0] == 'd')
-                {
+                } else if (optarg[0] == 'd') {
                     opts.frame_dstar = 1;
                     opts.frame_x2tdma = 0;
                     opts.frame_p25p1 = 0;
@@ -620,9 +580,7 @@ main (int argc, char **argv)
                     opts.frame_dmr = 0;
                     opts.frame_provoice = 0;
                     fprintf(stderr, "Decoding only D-STAR frames.\n");
-                }
-                else if (optarg[0] == 'x')
-                {
+                } else if (optarg[0] == 'x') {
                     opts.frame_dstar = 0;
                     opts.frame_x2tdma = 1;
                     opts.frame_p25p1 = 0;
@@ -631,9 +589,7 @@ main (int argc, char **argv)
                     opts.frame_dmr = 0;
                     opts.frame_provoice = 0;
                     fprintf(stderr, "Decoding only X2-TDMA frames.\n");
-                }
-                else if (optarg[0] == 'p')
-                {
+                } else if (optarg[0] == 'p') {
                     opts.frame_dstar = 0;
                     opts.frame_x2tdma = 0;
                     opts.frame_p25p1 = 0;
@@ -650,9 +606,7 @@ main (int argc, char **argv)
                     fprintf(stderr, "Setting symbol rate to 9600 / second\n");
                     fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
                     fprintf(stderr, "Decoding only ProVoice frames.\n");
-                }
-                else if (optarg[0] == '1')
-                {
+                } else if (optarg[0] == '1') {
                     opts.frame_dstar = 0;
                     opts.frame_x2tdma = 0;
                     opts.frame_p25p1 = 1;
@@ -661,9 +615,7 @@ main (int argc, char **argv)
                     opts.frame_dmr = 0;
                     opts.frame_provoice = 0;
                     fprintf(stderr, "Decoding only P25 Phase 1 frames.\n");
-                }
-                else if (optarg[0] == 'i')
-                {
+                } else if (optarg[0] == 'i') {
                     opts.frame_dstar = 0;
                     opts.frame_x2tdma = 0;
                     opts.frame_p25p1 = 0;
@@ -680,9 +632,7 @@ main (int argc, char **argv)
                     fprintf(stderr, "Setting symbol rate to 2400 / second\n");
                     fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
                     fprintf(stderr, "Decoding only NXDN 4800 baud frames.\n");
-                }
-                else if (optarg[0] == 'n')
-                {
+                } else if (optarg[0] == 'n') {
                     opts.frame_dstar = 0;
                     opts.frame_x2tdma = 0;
                     opts.frame_p25p1 = 0;
@@ -696,9 +646,7 @@ main (int argc, char **argv)
                     state.rf_mod = 2;
                     fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
                     fprintf(stderr, "Decoding only NXDN 9600 baud frames.\n");
-                }
-                else if (optarg[0] == 'r')
-                {
+                } else if (optarg[0] == 'r') {
                     opts.frame_dstar = 0;
                     opts.frame_x2tdma = 0;
                     opts.frame_p25p1 = 0;
@@ -710,31 +658,24 @@ main (int argc, char **argv)
                 }
                 break;
             case 'm':
-                if (optarg[0] == 'a')
-                {
+                if (optarg[0] == 'a') {
                     opts.mod_c4fm = 1;
                     opts.mod_qpsk = 1;
                     opts.mod_gfsk = 1;
                     state.rf_mod = 0;
-                }
-                else if (optarg[0] == 'c')
-                {
+                } else if (optarg[0] == 'c') {
                     opts.mod_c4fm = 1;
                     opts.mod_qpsk = 0;
                     opts.mod_gfsk = 0;
                     state.rf_mod = 0;
                     fprintf(stderr, "Enabling only C4FM modulation optimizations.\n");
-                }
-                else if (optarg[0] == 'g')
-                {
+                } else if (optarg[0] == 'g') {
                     opts.mod_c4fm = 0;
                     opts.mod_qpsk = 0;
                     opts.mod_gfsk = 1;
                     state.rf_mod = 2;
                     fprintf(stderr, "Enabling only GFSK modulation optimizations.\n");
-                }
-                else if (optarg[0] == 'q')
-                {
+                } else if (optarg[0] == 'q') {
                     opts.mod_c4fm = 0;
                     opts.mod_qpsk = 1;
                     opts.mod_gfsk = 0;
@@ -743,53 +684,45 @@ main (int argc, char **argv)
                 }
                 break;
             case 'u':
-                sscanf (optarg, "%i", &opts.uvquality);
-                if (opts.uvquality < 1)
-                {
+                sscanf(optarg, "%i", &opts.uvquality);
+                if (opts.uvquality < 1) {
                     opts.uvquality = 1;
-                }
-                else if (opts.uvquality > 64)
-                {
+                } else if (opts.uvquality > 64) {
                     opts.uvquality = 64;
                 }
-                fprintf(stderr, "Setting unvoice speech quality to %i waves per band.\n", opts.uvquality);
+                fprintf(stderr,
+                        "Setting unvoice speech quality to %i waves per band.\n",
+                        opts.uvquality);
                 break;
             case 'x':
-                if (optarg[0] == 'x')
-                {
+                if (optarg[0] == 'x') {
                     opts.inverted_x2tdma = 0;
                     fprintf(stderr, "Expecting non-inverted X2-TDMA signals.\n");
-                }
-                else if (optarg[0] == 'r')
-                {
+                } else if (optarg[0] == 'r') {
                     opts.inverted_dmr = 1;
                     fprintf(stderr, "Expecting inverted DMR/MOTOTRBO signals.\n");
                 }
                 break;
             case 'A':
-                sscanf (optarg, "%i", &opts.mod_threshold);
-                fprintf(stderr, "Setting C4FM/QPSK auto detection threshold to %i\n", opts.mod_threshold);
+                sscanf(optarg, "%i", &opts.mod_threshold);
+                fprintf(stderr,
+                        "Setting C4FM/QPSK auto detection threshold to %i\n",
+                        opts.mod_threshold);
                 break;
             case 'S':
-                sscanf (optarg, "%i", &opts.ssize);
-                if (opts.ssize > 128)
-                {
+                sscanf(optarg, "%i", &opts.ssize);
+                if (opts.ssize > 128) {
                     opts.ssize = 128;
-                }
-                else if (opts.ssize < 1)
-                {
+                } else if (opts.ssize < 1) {
                     opts.ssize = 1;
                 }
                 fprintf(stderr, "Setting QPSK symbol buffer to %i\n", opts.ssize);
                 break;
             case 'M':
-                sscanf (optarg, "%i", &opts.msize);
-                if (opts.msize > 1024)
-                {
+                sscanf(optarg, "%i", &opts.msize);
+                if (opts.msize > 1024) {
                     opts.msize = 1024;
-                }
-                else if (opts.msize < 1)
-                {
+                } else if (opts.msize < 1) {
                     opts.msize = 1;
                 }
                 fprintf(stderr, "Setting QPSK Min/Max buffer to %i\n", opts.msize);
@@ -803,84 +736,65 @@ main (int argc, char **argv)
             case 'l':
                 opts.use_cosine_filter = 0;
                 break;
-            case 'F':
-                opts.isFlushFile = 1;
-                break;
             default:
-                usage ();
-                exit (0);
+                usage();
+                exit(0);
         }
     }
 
 
-    if (opts.resume > 0)
-    {
-        openSerial (&opts, &state);
+    if (opts.resume > 0) {
+        openSerial(&opts, &state);
     }
 
 
 #ifdef USE_PORTAUDIO
-    if((strncmp(opts.audio_in_dev, "pa:", 3) == 0)
-       || (strncmp(opts.audio_out_dev, "pa:", 3) == 0))
-    {
+    if ((strncmp(opts.audio_in_dev, "pa:", 3) == 0) || (strncmp(opts.audio_out_dev,
+            "pa:",
+            3) == 0)) {
         fprintf(stderr, "Initializing portaudio.\n");
         PaError err = Pa_Initialize();
-        if( err != paNoError )
-        {
-            fprintf( stderr, "An error occured while initializing portaudio\n" );
-            fprintf( stderr, "Error number: %d\n", err );
-            fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+        if (err != paNoError) {
+            fprintf(stderr, "An error occured while initializing portaudio\n");
+            fprintf(stderr, "Error number: %d\n", err);
+            fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
             exit(err);
         }
     }
 #endif
 
-    if (opts.playfiles == 1)
-    {
+    if (opts.playfiles) {
         opts.split = 1;
         opts.playoffset = 0;
         opts.delay = 0;
-        if (strlen(opts.wav_out_file) > 0)
-        {
-            openWavOutFile (&opts, &state);
+        if (strlen(opts.wav_out_file) > 0) {
+            openWavOutFile(&opts, &state);
+        } else {
+            openAudioOutDevice(&opts, SAMPLE_RATE_OUT);
         }
-        else
-        {
-            openAudioOutDevice (&opts, SAMPLE_RATE_OUT);
-        }
-    }
-    else if (strcmp (opts.audio_in_dev, opts.audio_out_dev) != 0)
-    {
+    } else if (strcmp(opts.audio_in_dev, opts.audio_out_dev) != 0) {
         opts.split = 1;
         opts.playoffset = 0;
         opts.delay = 0;
-        if (strlen(opts.wav_out_file) > 0)
-        {
-            openWavOutFile (&opts, &state);
+        if (strlen(opts.wav_out_file) > 0) {
+            openWavOutFile(&opts, &state);
+        } else {
+            openAudioOutDevice(&opts, SAMPLE_RATE_OUT);
         }
-        else
-        {
-            openAudioOutDevice (&opts, SAMPLE_RATE_OUT);
-        }
-        openAudioInDevice (&opts);
-    }
-    else
-    {
+        openAudioInDevice(&opts);
+    } else {
         opts.split = 0;
         opts.playoffset = 25;     // 38
         opts.delay = 0;
-        openAudioInDevice (&opts);
+        openAudioInDevice(&opts);
         opts.audio_out_fd = opts.audio_in_fd;
     }
 
-    if (opts.playfiles == 1)
-    {
-        playMbeFiles (&opts, &state, argc, argv);
+    if (opts.playfiles) {
+        playMbeFiles(&opts, &state, argc, argv);
+    } else {
+        liveScanner(&opts, &state);
     }
-    else
-    {
-        liveScanner (&opts, &state);
-    }
-    cleanupAndExit (&opts, &state);
-    return (0);
+    cleanupAndExit(&opts, &state);
+    return 0;
 }
