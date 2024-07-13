@@ -20,6 +20,7 @@ debug_write_label_imbe(dsd_state* state, unsigned int cc, int bitindex, char bit
 }
 #endif
 
+#ifdef TRACE_DSD
 /**
  * Logs the IMBE's c0-c6 words.
  */
@@ -52,10 +53,10 @@ static void debug_log_imbe(char imbe_fr[8][23]) {
 
     fprintf(stderr, "\n");
 }
-
+#endif
 void process_IMBE(dsd_opts *opts, dsd_state *state, int *status_count) {
 
-    int j, dibit, status;
+    int j, dibit;
     char imbe_fr[8][23];
     const int *w, *x, *y, *z;
 
@@ -74,7 +75,7 @@ void process_IMBE(dsd_opts *opts, dsd_state *state, int *status_count) {
 #ifdef TRACE_DSD
             state->debug_prefix = 's';
 #endif
-            status = getDibit(opts, state);
+            getDibit(opts, state);
             // TODO: do something useful with the status bits...
             *status_count = 1;
 
@@ -85,8 +86,8 @@ void process_IMBE(dsd_opts *opts, dsd_state *state, int *status_count) {
             (*status_count)++;
         }
         dibit = getDibit(opts, state);
-        imbe_fr[*w][*x] = (1 & (dibit >> 1)); // bit 1
-        imbe_fr[*y][*z] = (1 & dibit);        // bit 0
+        imbe_fr[*w][*x] = (char) (1 & (dibit >> 1)); // bit 1
+        imbe_fr[*y][*z] = (char) (1 & dibit);        // bit 0
 
 #ifdef TRACE_DSD
         if (*w == 0) {

@@ -6,9 +6,8 @@
 #include "p25p1_heuristics.h"
 
 
-void
-processTDU (dsd_opts* opts, dsd_state* state)
-{
+void processTDU(dsd_opts *opts, dsd_state *state) {
+
     AnalogSignal analog_signal_array[14];
     int status_count;
 
@@ -27,8 +26,7 @@ processTDU (dsd_opts* opts, dsd_state* state)
 
     // trailing status symbol
     {
-        int status;
-        status = getDibit (opts, state) + '0';
+        getDibit(opts, state);
         // TODO: do something useful with the status bits...
     }
 }

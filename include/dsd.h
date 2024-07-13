@@ -19,7 +19,7 @@
 
 #define _XOPEN_SOURCE
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && defined(DNDEBUG)
-    #define _DEBUG
+    #undef _DEBUG
 #endif
 #include "config.h"
 #include <stdio.h>
@@ -201,7 +201,7 @@ typedef struct {
     mbe_parms *cur_mp;
     mbe_parms *prev_mp;
     mbe_parms *prev_mp_enhanced;
-    int p25kid;
+    long p25kid;
 
     unsigned int debug_audio_errors;
     unsigned int debug_header_errors;

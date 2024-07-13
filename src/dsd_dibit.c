@@ -21,7 +21,7 @@
 
 #include "p25p1_heuristics.h"
 
-static void print_datascope(dsd_opts *opts, dsd_state *state, int *sbuf2) {
+static void print_datascope(dsd_opts *opts, dsd_state *state, const int *__restrict__ sbuf2) {
 
     int i, j, o;
     char modulation[8];
@@ -98,7 +98,7 @@ static void print_datascope(dsd_opts *opts, dsd_state *state, int *sbuf2) {
     }
 }
 
-static void use_symbol(dsd_opts *opts, dsd_state *state, int symbol) {
+static void use_symbol(dsd_opts *opts, dsd_state *state) {
 
     int i;
     int sbuf2[128];
@@ -135,8 +135,8 @@ static void use_symbol(dsd_opts *opts, dsd_state *state, int symbol) {
         state->center = ((state->max) + (state->min)) / 2;
         state->umid = (((state->max) - state->center) * 5 / 8) + state->center;
         state->lmid = (((state->min) - state->center) * 5 / 8) + state->center;
-        state->maxref = (int) ((state->max) * 0.80F);
-        state->minref = (int) ((state->min) * 0.80F);
+        state->maxref = (int) ((float) (state->max) * 0.80F);
+        state->minref = (int) ((float) (state->min) * 0.80F);
     } else {
         state->maxref = state->max;
         state->minref = state->min;
@@ -175,7 +175,7 @@ static int invert_dibit(int dibit) {
     }
 }
 
-static int digitize(dsd_opts *opts, dsd_state *state, int symbol) {
+static int digitize(__attribute__((unused)) dsd_opts *opts, dsd_state *state, int symbol) {
     // determine dibit state
     if ((state->synctype == 6) || (state->synctype == 14) || (state->synctype == 18)) {
         //  6 +D-STAR
@@ -328,7 +328,7 @@ int get_dibit_and_analog_signal(dsd_opts *opts, dsd_state *state, int *out_analo
         *out_analog_signal = symbol;
     }
 
-    use_symbol(opts, state, symbol);
+    use_symbol(opts, state);
 
     dibit = digitize(opts, state, symbol);
 
@@ -358,10 +358,10 @@ int getDibit(dsd_opts *opts, dsd_state *state) {
 
 void skipDibit(dsd_opts *opts, dsd_state *state, int count) {
 
-    short sample;
+//    short sample;
     int i;
 
     for (i = 0; i < (count); i++) {
-        sample = getDibit(opts, state);
+        getDibit(opts, state);
     }
 }
