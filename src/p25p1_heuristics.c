@@ -1,5 +1,5 @@
-
 #define _USE_MATH_DEFINES
+
 #include <math.h>
 
 #include "dsd.h"
@@ -86,14 +86,13 @@
  * The value of the previous dibit is only taken into account on the C4FM modulation. QPSK and GFSK are
  * not improved by this technique.
  */
-static int use_previous_dibit(int rf_mod)
-{
+static int use_previous_dibit(int rf_mod) {
     // 0: C4FM modulation
     // 1: QPSK modulation
     // 2: GFSK modulation
 
     // Use previoud dibit information when on C4FM
-    return (rf_mod == 0)? 1 : 0;
+    return (rf_mod == 0) ? 1 : 0;
 }
 
 /**
@@ -104,13 +103,17 @@ static int use_previous_dibit(int rf_mod)
  * \param dibit The current dibit. Will be different from original_dibit if the FEC fixed it.
  * \param analog_value The actual analog signal value from which the original_dibit was derived.
  */
-static void update_p25_heuristics(P25Heuristics* heuristics, int previous_dibit, int original_dibit, int dibit, int analog_value)
-{
+static void update_p25_heuristics(P25Heuristics *heuristics,
+                                  int previous_dibit,
+                                  int original_dibit,
+                                  int dibit,
+                                  int analog_value) {
+
     float mean;
     int old_value;
     float old_mean;
 
-    SymbolHeuristics* sh;
+    SymbolHeuristics *sh;
     int number_errors;
 
 #ifndef USE_PREVIOUS_DIBIT
@@ -127,8 +130,7 @@ static void update_p25_heuristics(P25Heuristics* heuristics, int previous_dibit,
     // Update the BER statistics
     number_errors = 0;
     if (original_dibit != dibit) {
-        if ((original_dibit == 0 && dibit == 3) || (original_dibit == 3 && dibit == 0) ||
-            (original_dibit == 1 && dibit == 2) || (original_dibit == 2 && dibit == 1)) {
+        if ((original_dibit == 0 && dibit == 3) || (original_dibit == 3 && dibit == 0) || (original_dibit == 1 && dibit == 2) || (original_dibit == 2 && dibit == 1)) {
             // Interpreting a "00" as "11", "11" as "00", "01" as "10" or "10" as "01" counts as 2 errors
             number_errors = 2;
         } else {
@@ -140,28 +142,31 @@ static void update_p25_heuristics(P25Heuristics* heuristics, int previous_dibit,
 
     // Update the running mean and variance. This is to calculate the PDF faster when required
     if (sh->count >= HEURISTICS_SIZE) {
-        sh->sum -= old_value;
-        sh->var_sum -= (((float)old_value) - old_mean) * (((float)old_value) - old_mean);
+        sh->sum -= (float) old_value;
+        sh->var_sum -= (((float) old_value) - old_mean) * (((float) old_value) - old_mean);
     }
-    sh->sum += analog_value;
+    sh->sum += (float) analog_value;
 
     sh->values[sh->index] = analog_value;
     if (sh->count < HEURISTICS_SIZE) {
         sh->count++;
     }
-    mean = sh->sum / ((float)sh->count);
+    mean = sh->sum / ((float) sh->count);
     sh->means[sh->index] = mean;
-    if (sh->index >= (HEURISTICS_SIZE-1)) {
+    if (sh->index >= (HEURISTICS_SIZE - 1)) {
         sh->index = 0;
     } else {
         sh->index++;
     }
 
-    sh->var_sum += (((float)analog_value) - mean) * (((float)analog_value) - mean);
+    sh->var_sum += (((float) analog_value) - mean) * (((float) analog_value) - mean);
 }
 
-void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSignal* analog_signal_array, int count)
-{
+void contribute_to_heuristics(int rf_mod,
+                              P25Heuristics *heuristics,
+                              AnalogSignal *__restrict__ analog_signal_array,
+                              unsigned int count) {
+
     int i;
     int use_prev_dibit;
 
@@ -171,7 +176,7 @@ void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSigna
     use_prev_dibit = 0;
 #endif
 
-    for (i=0; i<count; i++) {
+    for (i = 0; i < count; i++) {
         int use;
         int prev_dibit;
 
@@ -183,7 +188,7 @@ void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSigna
             } else {
                 use = 1;
                 // The previous dibit is the corrected_dibit of the previous element
-                prev_dibit = analog_signal_array[i-1].corrected_dibit;
+                prev_dibit = analog_signal_array[i - 1].corrected_dibit;
             }
         } else {
             use = 1;
@@ -191,8 +196,11 @@ void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSigna
         }
 
         if (use) {
-            update_p25_heuristics(heuristics, prev_dibit, analog_signal_array[i].dibit,
-                    analog_signal_array[i].corrected_dibit, analog_signal_array[i].value);
+            update_p25_heuristics(heuristics,
+                    prev_dibit,
+                    analog_signal_array[i].dibit,
+                    analog_signal_array[i].corrected_dibit,
+                    analog_signal_array[i].value);
         }
     }
 }
@@ -201,19 +209,19 @@ void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSigna
  * Initializes the symbol's heuristics state.
  * \param sh The SymbolHeuristics structure to initialize.
  */
-static void initialize_symbol_heuristics(SymbolHeuristics* sh)
-{
+static void initialize_symbol_heuristics(SymbolHeuristics *sh) {
+
     sh->count = 0;
     sh->index = 0;
     sh->sum = 0;
     sh->var_sum = 0;
 }
 
-void initialize_p25_heuristics(P25Heuristics* heuristics)
-{
+void initialize_p25_heuristics(P25Heuristics *heuristics) {
+
     int i, j;
-    for (i=0; i<4; i++) {
-        for (j=0; j<4; j++) {
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
             initialize_symbol_heuristics(&(heuristics->symbols[i][j]));
         }
     }
@@ -227,33 +235,36 @@ void initialize_p25_heuristics(P25Heuristics* heuristics)
  * simplify very much. We don't really need to know the actual PDF value, just which Gaussian's got the
  * highest PDF, which is a simpler problem.
  */
-static float evaluate_pdf(SymbolHeuristics* se, int value)
-{
-    float x = (se->count*((float)value) - se->sum);
-    float y = -0.5F*x*x/(se->count*se->var_sum);
-    float pdf = sqrtf(se->count / se->var_sum) * expf(y) / sqrtf(2.0F * ((float) M_PI));
+static float evaluate_pdf(SymbolHeuristics *se, int value) {
+
+    float x = ((float) (se->count * value) - se->sum);
+    float y = -0.5F * x * x / ((float) se->count * se->var_sum);
+    float pdf = sqrtf((float) se->count / se->var_sum) * expf(y) / sqrtf(2.0F * ((float) M_PI));
 
     return pdf;
 }
 
-
 /**
  * Logging of the internal PDF values for a given analog value and previous dibit.
  */
-static void debug_log_pdf(P25Heuristics* heuristics, int previous_dibit, int analog_value)
-{
+/*static void debug_log_pdf(P25Heuristics *heuristics, int previous_dibit, int analog_value) {
+
     int i;
     float pdfs[4];
 
-    for (i=0; i<4; i++) {
+    for (i = 0; i < 4; i++) {
         pdfs[i] = evaluate_pdf(&(heuristics->symbols[previous_dibit][i]), analog_value);
     }
 
     fprintf(stderr, "v: %i, (%e, %e, %e, %e)\n", analog_value, pdfs[0], pdfs[1], pdfs[2], pdfs[3]);
-}
+}*/
 
-int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, int analog_value, int* dibit)
-{
+int estimate_symbol(int rf_mod,
+                    P25Heuristics *heuristics,
+                    int previous_dibit,
+                    int analog_value,
+                    int *dibit) {
+
     int valid;
     int i;
     float pdfs[4];
@@ -262,8 +273,7 @@ int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, i
 #ifdef USE_PREVIOUS_DIBIT
     int use_prev_dibit = use_previous_dibit(rf_mod);
 
-    if (use_prev_dibit == 0)
-    {
+    if (use_prev_dibit == 0) {
         // Ignore
         previous_dibit = 0;
     }
@@ -274,7 +284,7 @@ int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, i
     valid = 1;
 
     // Check if we have enough values to model the Gaussians for each symbol involved.
-    for (i=0; i<4; i++) {
+    for (i = 0; i < 4; i++) {
         if (heuristics->symbols[previous_dibit][i].count >= MIN_ELEMENTS_FOR_HEURISTICS) {
             pdfs[i] = evaluate_pdf(&(heuristics->symbols[previous_dibit][i]), analog_value);
         } else {
@@ -291,7 +301,7 @@ int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, i
 
         max_index = 0;
         max = pdfs[0];
-        for (i=1; i<4; i++) {
+        for (i = 1; i < 4; i++) {
             if (pdfs[i] > max) {
                 max_index = i;
                 max = pdfs[i];
@@ -312,57 +322,44 @@ int estimate_symbol(int rf_mod, P25Heuristics* heuristics, int previous_dibit, i
 /**
  * Logs the internal state of the heuristic's state. Good for debugging.
  */
-static void debug_print_symbol_heuristics(int previous_dibit, int dibit, SymbolHeuristics* sh)
-{
+static void debug_print_symbol_heuristics(int previous_dibit, int dibit, SymbolHeuristics *sh) {
+
     float mean, sd;
-    int k;
     int n;
 
     n = sh->count;
-    if (n == 0)
-    {
+    if (n == 0) {
         mean = 0;
         sd = 0;
-    }
-    else
-    {
-        mean = sh->sum/n;
+    } else {
+        mean = sh->sum / (float) n;
         sd = sqrtf(sh->var_sum / ((float) n));
     }
-    fprintf(stderr, "%i%i: count: %2i mean: % 10.2f sd: % 10.2f", previous_dibit, dibit, sh->count, mean, sd);
-    /*
-   fprintf(stderr, "(");
-    for (k=0; k<n; k++)
-      {
-        if (k != 0)
-          {
-           fprintf(stderr, ", ");
-          }
-        fprintf(stderr, "%i", sh->values[k]);
-      }
-   fprintf(stderr, ")");
-    */
+    fprintf(stderr,
+            "%i%i: count: %2i mean: % 10.2f sd: % 10.2f",
+            previous_dibit,
+            dibit,
+            sh->count,
+            mean,
+            sd);
     fprintf(stderr, "\n");
-
 }
 
-void debug_print_heuristics(P25Heuristics* heuristics)
-{
-    int i,j;
+void debug_print_heuristics(P25Heuristics *heuristics) {
+
+    int i, j;
 
     fprintf(stderr, "\n");
 
-    for(i=0; i<4; i++)
-    {
-        for(j=0; j<4; j++)
-        {
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
             debug_print_symbol_heuristics(i, j, &(heuristics->symbols[i][j]));
         }
     }
 }
 
-void update_error_stats(P25Heuristics* heuristics, int bits, int errors)
-{
+void update_error_stats(P25Heuristics *heuristics, int bits, int errors) {
+
     heuristics->bit_count += bits;
     heuristics->bit_error_count += errors;
 
@@ -374,13 +371,13 @@ void update_error_stats(P25Heuristics* heuristics, int bits, int errors)
     }
 }
 
-float get_P25_BER_estimate(P25Heuristics* heuristics)
-{
+float get_P25_BER_estimate(P25Heuristics *heuristics) {
+
     float ber;
     if (heuristics->bit_count == 0) {
         ber = 0.0F;
     } else {
-        ber = ((float)heuristics->bit_error_count) * 100.0F / ((float)heuristics->bit_count);
+        ber = ((float) heuristics->bit_error_count) * 100.0F / ((float) heuristics->bit_count);
     }
     return ber;
 }

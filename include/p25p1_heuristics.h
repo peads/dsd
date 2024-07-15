@@ -66,7 +66,7 @@ void debug_print_heuristics(P25Heuristics* heuristics);
  * \param analog_signal_array Sequence of AnalogSignal which contain the cleared dibits and analog values.
  * \param count number of cleared dibits passed (= number of elements to use from analog_signal_array).
  */
-void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSignal* analog_signal_array, int count);
+void contribute_to_heuristics(int rf_mod, P25Heuristics* heuristics, AnalogSignal* analog_signal_array, unsigned int count);
 
 /**
  * Updates the estimate for the BER (bit error rate). Mind this is method is not called for every single

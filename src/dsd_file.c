@@ -18,6 +18,7 @@
 #include "dsd.h"
 
 static void openFile(FILE **file, char *fileName) {
+
     char errorMsg[255];
 
     *file = fopen(fileName, "ro");
@@ -29,6 +30,7 @@ static void openFile(FILE **file, char *fileName) {
 }
 
 int checkFileError(FILE *file) {
+
     if (ferror(file)) {
         return 1;
     } else if (feof(file)) {
@@ -60,79 +62,68 @@ int handleFileError(char *fileName, int fileStatus) {
     return fileStatus;
 }
 
-void
-saveImbe4400Data (dsd_opts * opts, dsd_state * state, char *imbe_d)
-{
+void saveImbe4400Data(dsd_opts *opts, dsd_state *state, const char *imbe_d) {
+
     int i, j, k;
     unsigned char b;
     unsigned char err;
 
     err = (unsigned char) state->errs2;
-    fputc (err, opts->mbe_out_f);
+    fputc(err, opts->mbe_out_f);
 
     k = 0;
-    for (i = 0; i < 11; i++)
-    {
+    for (i = 0; i < 11; i++) {
         b = 0;
-        for (j = 0; j < 8; j++)
-        {
+        for (j = 0; j < 8; j++) {
             b = b << 1;
             b = b + imbe_d[k];
             k++;
         }
-        fputc (b, opts->mbe_out_f);
+        fputc(b, opts->mbe_out_f);
     }
-    fflush (opts->mbe_out_f);
+    fflush(opts->mbe_out_f);
 }
 
-void
-saveAmbe2450Data (dsd_opts * opts, dsd_state * state, char *ambe_d)
-{
+void saveAmbe2450Data(dsd_opts *opts, dsd_state *state, const char *ambe_d) {
+
     int i, j, k;
     unsigned char b;
     unsigned char err;
 
     err = (unsigned char) state->errs2;
-    fputc (err, opts->mbe_out_f);
+    fputc(err, opts->mbe_out_f);
 
     k = 0;
-    for (i = 0; i < 6; i++)
-    {
+    for (i = 0; i < 6; i++) {
         b = 0;
-        for (j = 0; j < 8; j++)
-        {
+        for (j = 0; j < 8; j++) {
             b = b << 1;
             b = b + ambe_d[k];
             k++;
         }
-        fputc (b, opts->mbe_out_f);
+        fputc(b, opts->mbe_out_f);
     }
     b = ambe_d[48];
-    fputc (b, opts->mbe_out_f);
-    fflush (opts->mbe_out_f);
+    fputc(b, opts->mbe_out_f);
+    fflush(opts->mbe_out_f);
 }
 
-int
-readImbe4400Data (dsd_opts * opts, dsd_state * state, char *imbe_d)
-{
+int readImbe4400Data(dsd_opts *opts, dsd_state *state, char *imbe_d) {
 
     int i, j, k;
     unsigned char b;
 
-    state->errs2 = fgetc (opts->mbe_in_f);
+    state->errs2 = fgetc(opts->mbe_in_f);
     state->errs = state->errs2;
 
     k = 0;
-    for (i = 0; i < 11; i++)
-    {
-        b = fgetc (opts->mbe_in_f);
-        if (feof (opts->mbe_in_f))
-        {
+    for (i = 0; i < 11; i++) {
+        b = fgetc(opts->mbe_in_f);
+        if (feof(opts->mbe_in_f)) {
             return (1);
         }
-        for (j = 0; j < 8; j++)
-        {
-            imbe_d[k] = (b & 128) >> 7;
+        for (j = 0; j < 8; j++) {
+            imbe_d[k] = (char) ((b & 128) >> 7);
             b = b << 1;
             b = b & 255;
             k++;
@@ -141,34 +132,29 @@ readImbe4400Data (dsd_opts * opts, dsd_state * state, char *imbe_d)
     return (0);
 }
 
-int
-readAmbe2450Data (dsd_opts * opts, dsd_state * state, char *ambe_d)
-{
+int readAmbe2450Data(dsd_opts *opts, dsd_state *state, char *ambe_d) {
 
     int i, j, k;
     unsigned char b;
 
-    state->errs2 = fgetc (opts->mbe_in_f);
+    state->errs2 = fgetc(opts->mbe_in_f);
     state->errs = state->errs2;
 
     k = 0;
-    for (i = 0; i < 6; i++)
-    {
-        b = fgetc (opts->mbe_in_f);
-        if (feof (opts->mbe_in_f))
-        {
+    for (i = 0; i < 6; i++) {
+        b = fgetc(opts->mbe_in_f);
+        if (feof(opts->mbe_in_f)) {
             return (1);
         }
-        for (j = 0; j < 8; j++)
-        {
-            ambe_d[k] = (b & 128) >> 7;
+        for (j = 0; j < 8; j++) {
+            ambe_d[k] = (char) ((b & 128) >> 7);
             b = b << 1;
             b = b & 255;
             k++;
         }
     }
-    b = fgetc (opts->mbe_in_f);
-    ambe_d[48] = (b & 1);
+    b = fgetc(opts->mbe_in_f);
+    ambe_d[48] = (char) (b & 1);
 
     return (0);
 }
@@ -204,116 +190,99 @@ void openMbeInFile(dsd_opts *opts, dsd_state *state) {
     }
 }
 
-void
-closeMbeOutFile (dsd_opts * opts, dsd_state * state)
-{
+void closeMbeOutFile(dsd_opts *opts, dsd_state *state) {
 
     char shell[255], newfilename[64], ext[5], datestr[32], new_path[1024];
     char tgid[17];
-    int sum, i, j;
-    int talkgroup;
+    float sum;
+    int i, j;
+    long talkgroup;
     struct tm timep;
     int result;
 
-    if (opts->mbe_out_f != NULL)
-    {
-        if ((state->synctype == 0) || (state->synctype == 1) || (state->synctype == 14) || (state->synctype == 15))
-        {
-            sprintf (ext, ".imb");
-            strptime (opts->mbe_out_file, "%s.imb", &timep);
-        }
-        else
-        {
-            sprintf (ext, ".amb");
-            strptime (opts->mbe_out_file, "%s.amb", &timep);
+    if (opts->mbe_out_f != NULL) {
+        if (!state->synctype || (1 == state->synctype) || (14 == state->synctype) || (15 == state->synctype)) {
+            sprintf(ext, ".imb");
+            strptime(opts->mbe_out_file, "%s.imb", &timep);
+        } else {
+            sprintf(ext, ".amb");
+            strptime(opts->mbe_out_file, "%s.amb", &timep);
         }
 
-        if (state->tgcount > 0)
-        {
-            for (i = 0; i < 16; i++)
-            {
+        if (state->tgcount > 0) {
+            for (i = 0; i < 16; i++) {
                 sum = 0;
-                for (j = 0; j < state->tgcount; j++)
-                {
-                    sum = sum + state->tg[j][i] - 48;
+                for (j = 0; j < state->tgcount; j++) {
+                    sum = sum + (float) state->tg[j][i] - 48.f;
                 }
-                tgid[i] = (char) (((float) sum / (float) state->tgcount) + 48.5);
+                tgid[i] = (char) (sum / (float) state->tgcount + 48.5f);
             }
             tgid[16] = 0;
-            talkgroup = (int) strtol (tgid, NULL, 2);
-        }
-        else
-        {
+            talkgroup = strtol(tgid, NULL, 2);
+        } else {
             talkgroup = 0;
         }
 
-        fflush (opts->mbe_out_f);
-        fclose (opts->mbe_out_f);
+        fflush(opts->mbe_out_f);
+        fclose(opts->mbe_out_f);
         opts->mbe_out_f = NULL;
-        strftime (datestr, 31, "%Y-%m-%d-%H%M%S", &timep);
-        sprintf (newfilename, "nac%X-%s-tg%i%s", state->nac, datestr, talkgroup, ext);
-        sprintf (new_path, "%s%s", opts->mbe_out_dir, newfilename);
+        strftime(datestr, 31, "%Y-%m-%d-%H%M%S", &timep);
+        sprintf(newfilename, "nac%X-%s-tg%li%s", state->nac, datestr, talkgroup, ext);
+        sprintf(new_path, "%s%s", opts->mbe_out_dir, newfilename);
 #ifdef _WIN32
         sprintf (shell, "move %s %s", opts->mbe_out_path, new_path);
 #else
-        sprintf (shell, "mv %s %s", opts->mbe_out_path, new_path);
+        sprintf(shell, "mv %s %s", opts->mbe_out_path, new_path);
 #endif
-        result = system (shell);
+        result = system(shell);
+        if (result) {
+            perror(NULL);
+        }
 
         state->tgcount = 0;
-        for (i = 0; i < 25; i++)
-        {
-            for (j = 0; j < 16; j++)
-            {
+        for (i = 0; i < 25; i++) {
+            for (j = 0; j < 16; j++) {
                 state->tg[i][j] = 48;
             }
         }
     }
 }
 
-void
-openMbeOutFile (dsd_opts * opts, dsd_state * state)
-{
+void openMbeOutFile(dsd_opts *opts, dsd_state *state) {
 
     struct timeval tv;
     int i, j;
     char ext[5];
 
-    if ((state->synctype == 0) || (state->synctype == 1) || (state->synctype == 14) || (state->synctype == 15))
-    {
-        sprintf (ext, ".imb");
-    }
-    else
-    {
-        sprintf (ext, ".amb");
+    if (!state->synctype || (1 == state->synctype) || (14 == state->synctype) || (15 == state->synctype)) {
+        sprintf(ext, ".imb");
+    } else {
+        sprintf(ext, ".amb");
     }
 
     //  reset talkgroup id buffer
-    for (i = 0; i < 12; i++)
-    {
-        for (j = 0; j < 25; j++)
-        {
+    for (i = 0; i < 12; i++) {
+        for (j = 0; j < 25; j++) {
             state->tg[j][i] = 0;
         }
     }
 
     state->tgcount = 0;
 
-    gettimeofday (&tv, NULL);
-    sprintf (opts->mbe_out_file, "%i%s", (int) tv.tv_sec, ext);
+    gettimeofday(&tv, NULL);
+    sprintf(opts->mbe_out_file, "%i%s", (int) tv.tv_sec, ext);
 
     sprintf(opts->mbe_out_path, "%s%s", opts->mbe_out_dir, opts->mbe_out_file);
 
-    opts->mbe_out_f = fopen (opts->mbe_out_path, "w");
-    if (opts->mbe_out_f == NULL)
-    {
+    opts->mbe_out_f = fopen(opts->mbe_out_path, "w");
+    if (opts->mbe_out_f == NULL) {
         fprintf(stderr, "Error, couldn't open %s\n", opts->mbe_out_path);
     }
 
     // write magic
-    fprintf (opts->mbe_out_f, "%s", ext);
+    fprintf(opts->mbe_out_f, "%s", ext);
 
-    fflush (opts->mbe_out_f);
+    fflush(opts->mbe_out_f);
 }
 
 void openWavOutFile(dsd_opts *opts, __attribute__((unused)) dsd_state *state) {

@@ -1,4 +1,3 @@
-
 #include "p25p1_check_ldu.h"
 
 #include "Hamming.hpp"
@@ -14,18 +13,18 @@ static Hamming_10_6_3_TableImpl hamming;
 static DSDReedSolomon_24_12_13 reed_solomon_24_12_13;
 static DSDReedSolomon_24_16_9 reed_solomon_24_16_9;
 
-int check_and_fix_hamming_10_6_3(char* hex, char* parity)
-{
+int check_and_fix_hamming_10_6_3(char *hex, char *parity) {
+
     return hamming.decode(hex, parity);
 }
 
-void encode_hamming_10_6_3(char* hex, char* out_parity)
-{
+void encode_hamming_10_6_3(char *hex, char *out_parity) {
+
     hamming.encode(hex, out_parity);
 }
 
-int check_and_fix_reedsolomon_24_12_13(char* data, char* parity)
-{
+int check_and_fix_reedsolomon_24_12_13(char *data, char *parity) {
+
 #ifdef CHECK_LDU_DEBUG
     char original[12][6];
     for (int i = 0; i < 12; i++) {
@@ -69,13 +68,13 @@ int check_and_fix_reedsolomon_24_12_13(char* data, char* parity)
     return irrecoverable_error;
 }
 
-void encode_reedsolomon_24_12_13(char* hex_data, char* fixed_parity)
-{
+void encode_reedsolomon_24_12_13(char *hex_data, char *fixed_parity) {
+
     reed_solomon_24_12_13.encode(hex_data, fixed_parity);
 }
 
-int check_and_fix_reedsolomon_24_16_9(char* data, char* parity)
-{
+int check_and_fix_reedsolomon_24_16_9(char *data, char *parity) {
+
 #ifdef CHECK_LDU_DEBUG
     char original[16][6];
     for (int i = 0; i < 16; i++) {
@@ -119,7 +118,7 @@ int check_and_fix_reedsolomon_24_16_9(char* data, char* parity)
     return irrecoverable_error;
 }
 
-void encode_reedsolomon_24_16_9(char* hex_data, char* fixed_parity)
-{
+void encode_reedsolomon_24_16_9(char *hex_data, char *fixed_parity) {
+
     reed_solomon_24_16_9.encode(hex_data, fixed_parity);
 }

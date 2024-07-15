@@ -1,26 +1,25 @@
 #include <termios.h>
 #include "dsd.h"
 
-void
-openSerial (dsd_opts * opts, dsd_state * state)
-{
+void openSerial(dsd_opts *opts, dsd_state *state) {
 
     struct termios tty;
     speed_t baud;
 
-    fprintf(stderr, "Opening serial port %s and setting baud to %i\n", opts->serial_dev, opts->serial_baud);
-    opts->serial_fd = open (opts->serial_dev, O_WRONLY);
-    if (opts->serial_fd == -1)
-    {
+    fprintf(stderr,
+            "Opening serial port %s and setting baud to %i\n",
+            opts->serial_dev,
+            opts->serial_baud);
+    opts->serial_fd = open(opts->serial_dev, O_WRONLY);
+    if (opts->serial_fd == -1) {
         fprintf(stderr, "Error, couldn't open %s\n", opts->serial_dev);
-        exit (1);
+        exit(1);
     }
 
     tty.c_cflag = 0;
 
     baud = B115200;
-    switch (opts->serial_baud)
-    {
+    switch (opts->serial_baud) {
         case 1200:
             baud = B1200;
         case 2400:
@@ -46,10 +45,9 @@ openSerial (dsd_opts * opts, dsd_state * state)
             baud = B230400;
             break;
     }
-    if (opts->serial_baud > 0)
-    {
-        cfsetospeed (&tty, baud);
-        cfsetispeed (&tty, baud);
+    if (opts->serial_baud > 0) {
+        cfsetospeed(&tty, baud);
+        cfsetispeed(&tty, baud);
     }
 
     tty.c_cflag |= (tty.c_cflag & ~CSIZE) | CS8;
@@ -63,28 +61,25 @@ openSerial (dsd_opts * opts, dsd_state * state)
     tty.c_cc[VMIN] = 1;
     tty.c_cc[VTIME] = 5;
 
-    tcsetattr (opts->serial_fd, TCSANOW, &tty);
+    tcsetattr(opts->serial_fd, TCSANOW, &tty);
 
 }
 
-void
-resumeScan (dsd_opts * opts, dsd_state * state)
-{
+void resumeScan(dsd_opts *opts, dsd_state *state) {
 
     char cmd[16];
     ssize_t result;
 
-    if (opts->serial_fd > 0)
-    {
-        sprintf (cmd, "\rKEY00\r");
-        result = write (opts->serial_fd, cmd, 7);
+    if (opts->serial_fd > 0) {
+        sprintf(cmd, "\rKEY00\r");
+        result = write(opts->serial_fd, cmd, 7);
         cmd[0] = 2;
         cmd[1] = 75;
         cmd[2] = 15;
         cmd[3] = 3;
         cmd[4] = 93;
         cmd[5] = 0;
-        result = write (opts->serial_fd, cmd, 5);
+        result = write(opts->serial_fd, cmd, 5);
         state->numtdulc = 0;
     }
 }
