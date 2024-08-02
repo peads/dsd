@@ -61,6 +61,7 @@ if (HELP2MAN_FOUND)
             --version-string=${GIT_TAG}
             -o ${CMAKE_CURRENT_BINARY_DIR}/dsd.1
             --no-info
+            --no-discard-stderr
             $<TARGET_FILE:dsd>
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dsd.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
